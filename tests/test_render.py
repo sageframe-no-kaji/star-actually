@@ -1,15 +1,12 @@
 """Render-stage and CLI tests: a synthetic closed graph plus the real exemplars."""
 
 import json
-import shutil
 from pathlib import Path
 
 import pytest
 
 from star_actually.cli import main
 from star_actually.render import render_site
-
-REPO_ROOT = Path(__file__).parent.parent
 
 ROOT_NODE = """\
 ---
@@ -66,13 +63,12 @@ author: "A"
 
 @pytest.fixture
 def synthetic_root(tmp_path: Path) -> Path:
-    """A minimal repo root: two nodes, real templates and assets."""
+    """A minimal repo root: two nodes and a site.yaml. Templates and assets
+    come from the engine package, not the instance root."""
     (tmp_path / "nodes").mkdir()
     (tmp_path / "nodes" / "root-idea.md").write_text(ROOT_NODE, encoding="utf-8")
     (tmp_path / "nodes" / "child-idea.md").write_text(CHILD_NODE, encoding="utf-8")
     (tmp_path / "site.yaml").write_text(SITE, encoding="utf-8")
-    shutil.copytree(REPO_ROOT / "templates", tmp_path / "templates")
-    shutil.copytree(REPO_ROOT / "assets", tmp_path / "assets")
     return tmp_path
 
 

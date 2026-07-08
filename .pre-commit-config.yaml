@@ -1,7 +1,7 @@
 # *, Actually engine — pre-commit stack. Install: `pre-commit install`
 
 # Vendored third-party files stay byte-identical to upstream.
-exclude: ^assets/htmx\.min\.js$
+exclude: ^src/star_actually/assets/htmx\.min\.js$
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks

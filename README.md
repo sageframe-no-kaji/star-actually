@@ -10,7 +10,7 @@ content and consumes this engine.
 
 - **The Loom** (`src/star_actually/`) — parses `nodes/`, validates the graph,
   renders the static site. CLI: `star-actually validate | build | serve`.
-- **The Terminal** (`templates/`, `assets/`) — the reading experience: HTML +
+- **The Terminal** (`src/star_actually/templates/`, `src/star_actually/assets/`) — the reading experience: HTML +
   CSS + one vanilla JS file + vendored htmx. Zero external requests.
 - **The Receptionist** (`portal/`) — the one dynamic piece: a FastAPI service
   mapping a natural-language question to an entry node. Optional; dormant until

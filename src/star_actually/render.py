@@ -26,6 +26,13 @@ from star_actually.nodes import Node, load_nodes
 
 DEFAULT_DEPTH = 2
 
+# The Terminal ships with the engine, not the instance. Templates and assets are
+# package data, resolved relative to this module so any instance (whatever its
+# working directory) renders with the same presentation layer.
+_PACKAGE_DIR = Path(__file__).resolve().parent
+TEMPLATES_DIR = _PACKAGE_DIR / "templates"
+ASSETS_DIR = _PACKAGE_DIR / "assets"
+
 
 @dataclass(frozen=True)
 class RenderResult:
@@ -87,7 +94,7 @@ def render_site(
     site = load_config(root / "site.yaml")
     nodes = load_nodes(root / "nodes")
     graph = build_graph(nodes, allow_dangling=allow_dangling)
-    env = _environment(root / "templates")
+    env = _environment(TEMPLATES_DIR)
     md = _markdown()
 
     if out_dir.exists():
@@ -154,7 +161,7 @@ def render_site(
     )
 
     assets_out = out_dir / "assets"
-    shutil.copytree(root / "assets", assets_out, ignore=shutil.ignore_patterns(".gitkeep"))
+    shutil.copytree(ASSETS_DIR, assets_out, ignore=shutil.ignore_patterns(".gitkeep"))
 
     warnings = list(graph.warnings)
     if root_node is None:
