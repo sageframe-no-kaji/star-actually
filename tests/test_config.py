@@ -56,3 +56,22 @@ def test_empty_value(tmp_path: Path) -> None:
     path.write_text(VALID.replace('author: "A"', 'author: ""'), encoding="utf-8")
     with pytest.raises(ConfigError, match="'author' must be a non-empty string"):
         load_config(path)
+
+
+def test_receptionist_defaults_off(tmp_path: Path) -> None:
+    path = tmp_path / "site.yaml"
+    path.write_text(VALID, encoding="utf-8")
+    assert load_config(path).receptionist is False
+
+
+def test_receptionist_enabled(tmp_path: Path) -> None:
+    path = tmp_path / "site.yaml"
+    path.write_text(VALID + "receptionist: true\n", encoding="utf-8")
+    assert load_config(path).receptionist is True
+
+
+def test_receptionist_must_be_bool(tmp_path: Path) -> None:
+    path = tmp_path / "site.yaml"
+    path.write_text(VALID + 'receptionist: "yes"\n', encoding="utf-8")
+    with pytest.raises(ConfigError, match="true or false"):
+        load_config(path)

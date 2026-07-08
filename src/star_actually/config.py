@@ -6,7 +6,7 @@ arrives through ``site.yaml``. The engine itself stays domain-blind.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, fields
+from dataclasses import dataclass
 from pathlib import Path
 
 import yaml
@@ -29,6 +29,23 @@ class SiteConfig:
     root_node: str
     repo: str
     author: str
+    receptionist: bool = False  # does this instance have a live /ask backend?
+
+
+# The domain strings every site.yaml must supply. `receptionist` is the one
+# optional, non-string knob: it declares whether the /ask receptionist is live,
+# defaulting off (static-first). Adding it is backward-compatible.
+_STRING_KEYS = (
+    "title",
+    "system_name",
+    "domain_word",
+    "tagline",
+    "prompt",
+    "url",
+    "root_node",
+    "repo",
+    "author",
+)
 
 
 def load_config(path: Path) -> SiteConfig:
@@ -39,15 +56,22 @@ def load_config(path: Path) -> SiteConfig:
     if not isinstance(data, dict):
         raise ConfigError(f"{path.name}: must be a YAML mapping")
 
-    expected = {f.name for f in fields(SiteConfig)}
-    unknown = set(data) - expected
+    known = set(_STRING_KEYS) | {"receptionist"}
+    unknown = set(data) - known
     if unknown:
         raise ConfigError(f"{path.name}: unknown keys: {sorted(unknown)}")
-    missing = expected - set(data)
+    missing = set(_STRING_KEYS) - set(data)
     if missing:
         raise ConfigError(f"{path.name}: missing keys: {sorted(missing)}")
-    for key in expected:
+    for key in _STRING_KEYS:
         if not isinstance(data[key], str) or not data[key].strip():
             raise ConfigError(f"{path.name}: key {key!r} must be a non-empty string")
 
-    return SiteConfig(**{key: str(data[key]).strip() for key in expected})
+    receptionist = data.get("receptionist", False)
+    if not isinstance(receptionist, bool):
+        raise ConfigError(f"{path.name}: key 'receptionist' must be true or false")
+
+    return SiteConfig(
+        receptionist=receptionist,
+        **{key: str(data[key]).strip() for key in _STRING_KEYS},
+    )

@@ -128,6 +128,21 @@ class TestRenderSite:
         assert "What do you want to know about X, actually?" in entry
         assert "The Root Idea" in entry
 
+    def test_entry_receptionist_off_by_default(self, synthetic_root: Path) -> None:
+        out = synthetic_root / "dist"
+        render_site(synthetic_root, out)
+        entry = (out / "index.html").read_text(encoding="utf-8")
+        assert 'data-receptionist="off"' in entry
+        assert "&crarr;</kbd> search" in entry  # the Enter hint reads "search", not "ask"
+
+    def test_entry_receptionist_on(self, synthetic_root: Path) -> None:
+        (synthetic_root / "site.yaml").write_text(SITE + "receptionist: true\n", encoding="utf-8")
+        out = synthetic_root / "dist"
+        render_site(synthetic_root, out)
+        entry = (out / "index.html").read_text(encoding="utf-8")
+        assert 'data-receptionist="on"' in entry
+        assert "&crarr;</kbd> ask" in entry
+
     def test_catalog(self, synthetic_root: Path) -> None:
         out = synthetic_root / "dist"
         render_site(synthetic_root, out)

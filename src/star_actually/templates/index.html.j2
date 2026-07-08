@@ -11,7 +11,7 @@
   <h1 class="entry-title">{{ site.title }}</h1>
   <p class="entry-tagline">{{ site.tagline }}</p>
 
-  <form class="entry-prompt" id="ask-form" action="/help.html" method="get">
+  <form class="entry-prompt" id="ask-form" action="/help.html" method="get" data-receptionist="{{ 'on' if site.receptionist else 'off' }}">
     <label class="prompt-label" for="ask">{{ site.prompt }}</label>
     <div class="prompt-line">
       <span class="prompt-glyph">&gt;</span>
@@ -33,7 +33,7 @@
 </main>
 
 <footer class="action-bar">
-  <span class="key-hint"><kbd>&crarr;</kbd> ask</span>
+  <span class="key-hint"><kbd>&crarr;</kbd> {{ 'ask' if site.receptionist else 'search' }}</span>
   <span class="key-hint"><kbd>&darr;</kbd> begin</span>
   <span class="key-hint"><kbd>/</kbd> search</span>
   <span class="key-hint"><kbd>?</kbd> help</span>

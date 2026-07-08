@@ -405,16 +405,19 @@
       }
     });
 
-    /* Enter: try the Receptionist first (same-origin /ask, short timeout);
-       fall back to the top search result if it's absent, slow, or wrong. */
+    var goToFirst = function () {
+      var first = results.querySelector("a");
+      if (first) window.location.href = first.getAttribute("href");
+    };
+    /* Enter: off (static, per data-receptionist) → best result; on → /ask. */
     form.addEventListener("submit", function (ev) {
       ev.preventDefault();
+      if (form.dataset.receptionist !== "on") { goToFirst(); return; }
       var asking = span("result-summary", "asking the receptionist…");
       results.insertBefore(asking, results.firstChild);
       var fallback = function () {
         if (asking.parentNode) asking.parentNode.removeChild(asking);
-        var first = results.querySelector("a");
-        if (first) window.location.href = first.getAttribute("href");
+        goToFirst();
       };
       var controller = new AbortController();
       var timer = setTimeout(function () { controller.abort(); }, 1500);
