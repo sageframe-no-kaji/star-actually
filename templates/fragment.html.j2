@@ -1,0 +1,76 @@
+<article class="node" id="content"
+  data-node-id="{{ node.id }}"
+  data-depth="{{ depth }}"
+  data-max-depth="{{ node.depth_levels }}"
+  data-title="{{ node.title }}">
+
+  <header class="node-head">
+    <div class="node-title-line">
+      <h1 class="node-title">{{ node.title }}</h1>
+      <span class="node-type node-type-{{ node.type.value }}">{{ node.type.value }}</span>
+    </div>
+    <div class="depth-dial">
+      <span class="depth-gauge" aria-label="depth {{ depth }} of {{ node.depth_levels }}">
+        {%- for d in range(1, node.depth_levels + 1) -%}
+        <span class="gauge-cell{% if d <= depth %} lit{% endif %}"></span>
+        {%- endfor -%}
+      </span>
+      <span class="depth-label">depth {{ depth }}/{{ node.depth_levels }}</span>
+      {% if depth < node.depth_levels -%}
+      <a class="depth-step depth-deeper" href="/n/{{ node.id }}/d{{ depth + 1 }}/"
+         hx-get="/n/{{ node.id }}/d{{ depth + 1 }}.html" hx-target="#content" hx-swap="outerHTML">&minus; deeper</a>
+      {%- endif %}
+      {% if depth > 1 -%}
+      <a class="depth-step depth-shallower" href="/n/{{ node.id }}/d{{ depth - 1 }}/"
+         hx-get="/n/{{ node.id }}/d{{ depth - 1 }}.html" hx-target="#content" hx-swap="outerHTML">+ surface</a>
+      {%- endif %}
+    </div>
+  </header>
+
+  <div class="layers">
+    {% for layer in layers %}
+    <section class="layer layer-{{ layer.depth }}" data-depth="{{ layer.depth }}">
+      {{ layer.html | safe }}
+    </section>
+    {% endfor %}
+  </div>
+
+  <nav class="neighborhood">
+    {% if forward %}
+    <section class="hood onward">
+      <h2 class="hood-label">onward</h2>
+      <ul>
+        {% for n in forward %}
+        <li><a class="nav-node nav-forward" data-node-id="{{ n.id }}" href="/n/{{ n.id }}/"
+               hx-get="/n/{{ n.id }}/d{{ 2 }}.html" hx-target="#content" hx-swap="outerHTML"
+               hx-push-url="/n/{{ n.id }}/">&darr; {{ n.title }}</a></li>
+        {% endfor %}
+      </ul>
+    </section>
+    {% endif %}
+    {% if lateral %}
+    <section class="hood lateral">
+      <h2 class="hood-label">lateral</h2>
+      <ul>
+        {% for n in lateral %}
+        <li><a class="nav-node nav-lateral" data-node-id="{{ n.id }}" href="/n/{{ n.id }}/"
+               hx-get="/n/{{ n.id }}/d{{ 2 }}.html" hx-target="#content" hx-swap="outerHTML"
+               hx-push-url="/n/{{ n.id }}/">&rarr; {{ n.title }}</a></li>
+        {% endfor %}
+      </ul>
+    </section>
+    {% endif %}
+    {% if backlinks %}
+    <section class="hood backlinks">
+      <h2 class="hood-label">what points here</h2>
+      <ul>
+        {% for n in backlinks %}
+        <li><a class="nav-node nav-backlink" data-node-id="{{ n.id }}" href="/n/{{ n.id }}/"
+               hx-get="/n/{{ n.id }}/d{{ 2 }}.html" hx-target="#content" hx-swap="outerHTML"
+               hx-push-url="/n/{{ n.id }}/">&uarr; {{ n.title }}</a></li>
+        {% endfor %}
+      </ul>
+    </section>
+    {% endif %}
+  </nav>
+</article>

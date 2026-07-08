@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ page_title }}</title>
+<link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+<header class="site-head">
+  <a class="site-name" href="/">{{ site.title }}</a>
+  <span class="site-tagline">{{ site.tagline }}</span>
+</header>
+
+<div class="rail" id="rail" aria-label="your path"></div>
+
+<main class="reading">
+{{ content | safe }}
+</main>
+
+<footer class="action-bar" id="action-bar">
+  <span class="key-hint"><kbd>&uarr;</kbd> back</span>
+  <span class="key-hint"><kbd>&darr;</kbd> onward</span>
+  <span class="key-hint"><kbd>&minus;</kbd> deeper</span>
+  <span class="key-hint"><kbd>+</kbd> surface</span>
+  <span class="key-hint"><kbd>&rarr;</kbd> branch</span>
+  <span class="key-hint"><kbd>&crarr;</kbd> return</span>
+  <span class="key-hint"><a href="/"><kbd>/</kbd> search</a></span>
+  <span class="key-hint"><a href="/help.html"><kbd>?</kbd> help</a></span>
+</footer>
+
+<script src="/assets/htmx.min.js"></script>
+<script src="/assets/app.js"></script>
+</body>
+</html>

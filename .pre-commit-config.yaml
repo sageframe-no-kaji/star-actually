@@ -1,0 +1,36 @@
+# *, Actually engine — pre-commit stack. Install: `pre-commit install`
+
+# Vendored third-party files stay byte-identical to upstream.
+exclude: ^assets/htmx\.min\.js$
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-toml
+      - id: check-added-large-files
+        args: ['--maxkb=1024']
+      - id: check-merge-conflict
+      - id: detect-private-key
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.7.4
+    hooks:
+      - id: ruff-format
+      - id: ruff
+        args: [--fix]
+
+  # mypy runs in the project environment (not an isolated hook env) so the
+  # local package resolves regardless of which files a commit touches —
+  # identical to `make typecheck`.
+  - repo: local
+    hooks:
+      - id: mypy
+        name: mypy
+        entry: uv run mypy src tests portal
+        language: system
+        types: [python]
+        pass_filenames: false

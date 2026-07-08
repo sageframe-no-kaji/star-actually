@@ -1,0 +1,114 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "star-actually"
+version = "0.1.0"
+description = "The Loom + Terminal + Receptionist for *, Actually — weaves depth-layered markdown nodes into fully static, navigable, terminal-aesthetic knowledge sites. Domain-blind: instances supply nodes/ and site.yaml."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+authors = [
+    { name = "Andrew T Marcus", email = "atmarcus@gmail.com" },
+]
+dependencies = [
+    "pyyaml>=6.0",
+    "markdown-it-py>=3.0",
+    "jinja2>=3.1",
+]
+
+[project.scripts]
+star-actually = "star_actually.cli:main"
+
+[dependency-groups]
+portal = [
+    "fastapi>=0.115",
+    "anthropic>=0.40",
+    "uvicorn>=0.30",
+]
+dev = [
+    "ruff>=0.7",
+    "mypy>=1.13",
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+    "pre-commit>=4.0",
+    "types-pyyaml>=6.0",
+    "httpx>=0.27",
+    { include-group = "portal" },
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/star_actually"]
+
+# ────────────────────────────────────────────────────────────────────────
+# Ruff: lint + format
+# ────────────────────────────────────────────────────────────────────────
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "B", "UP", "N", "RUF", "SIM"]
+ignore = []
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["B011"]  # allow `assert False` in tests
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+# ────────────────────────────────────────────────────────────────────────
+# mypy: strict
+# ────────────────────────────────────────────────────────────────────────
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+strict_equality = true
+
+# ────────────────────────────────────────────────────────────────────────
+# pytest + coverage — floor enforced at 90%
+# ────────────────────────────────────────────────────────────────────────
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]  # portal/ is app code at the repo root, not an installed package
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--verbose",
+    "--cov=src/star_actually",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-fail-under=90",
+    "--strict-markers",
+]
+markers = [
+    "slow: marks tests as slow (deselect with -m 'not slow')",
+]
+
+[tool.coverage.run]
+branch = true
+source = ["src/star_actually"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if __name__ == .__main__.:",
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
+]

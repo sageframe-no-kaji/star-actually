@@ -1,0 +1,18 @@
+# Private prompts (sageframe convention)
+/prompts/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Environment
+.env
+
+# macOS
+.DS_Store

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ site.title }}</title>
+<link rel="stylesheet" href="/assets/style.css">
+</head>
+<body class="entry">
+<main class="entry-screen">
+  <h1 class="entry-title">{{ site.title }}</h1>
+  <p class="entry-tagline">{{ site.tagline }}</p>
+
+  <form class="entry-prompt" id="ask-form" action="/help.html" method="get">
+    <label class="prompt-label" for="ask">{{ site.prompt }}</label>
+    <div class="prompt-line">
+      <span class="prompt-glyph">&gt;</span>
+      <input class="prompt-input" id="ask" name="q" type="text" autocomplete="off" autofocus
+             placeholder="type a question, or press &darr; to just start">
+      <span class="cursor" aria-hidden="true"></span>
+    </div>
+  </form>
+
+  <div class="entry-results" id="results" aria-live="polite"></div>
+
+  {% if root %}
+  <p class="entry-start">
+    <a class="nav-node nav-root" data-node-id="{{ root.id }}" href="/n/{{ root.id }}/">&darr; or start at the beginning: {{ root.title }}</a>
+  </p>
+  {% endif %}
+
+  <p class="entry-help"><a href="/help.html">? what is this place</a></p>
+</main>
+
+<footer class="action-bar">
+  <span class="key-hint"><kbd>&crarr;</kbd> ask</span>
+  <span class="key-hint"><kbd>&darr;</kbd> begin</span>
+  <span class="key-hint"><kbd>/</kbd> search</span>
+  <span class="key-hint"><kbd>?</kbd> help</span>
+</footer>
+
+<script src="/assets/htmx.min.js"></script>
+<script src="/assets/app.js"></script>
+</body>
+</html>
