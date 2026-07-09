@@ -30,6 +30,10 @@ class SiteConfig:
     repo: str
     author: str
     receptionist: bool = False  # does this instance have a live /ask backend?
+    blurb: str = ""  # 2-3 sentences on the entry screen: what this subject is
+    source_url: str = ""  # link to the canonical source of the content
+    source_label: str = ""  # link text for source_url
+    base_path: str = ""  # URL prefix when served under a subfolder, e.g. /ssh-actually
 
 
 # The domain strings every site.yaml must supply. `receptionist` is the one
@@ -47,6 +51,9 @@ _STRING_KEYS = (
     "author",
 )
 
+# Optional strings; default "". Rendered by the entry screen if present.
+_OPTIONAL_STRING_KEYS = ("blurb", "source_url", "source_label", "base_path")
+
 
 def load_config(path: Path) -> SiteConfig:
     """Load and validate site.yaml."""
@@ -56,7 +63,7 @@ def load_config(path: Path) -> SiteConfig:
     if not isinstance(data, dict):
         raise ConfigError(f"{path.name}: must be a YAML mapping")
 
-    known = set(_STRING_KEYS) | {"receptionist"}
+    known = set(_STRING_KEYS) | set(_OPTIONAL_STRING_KEYS) | {"receptionist"}
     unknown = set(data) - known
     if unknown:
         raise ConfigError(f"{path.name}: unknown keys: {sorted(unknown)}")
@@ -70,8 +77,12 @@ def load_config(path: Path) -> SiteConfig:
     receptionist = data.get("receptionist", False)
     if not isinstance(receptionist, bool):
         raise ConfigError(f"{path.name}: key 'receptionist' must be true or false")
+    for key in _OPTIONAL_STRING_KEYS:
+        if key in data and not isinstance(data[key], str):
+            raise ConfigError(f"{path.name}: key {key!r} must be a string")
 
     return SiteConfig(
         receptionist=receptionist,
         **{key: str(data[key]).strip() for key in _STRING_KEYS},
+        **{key: str(data.get(key, "")).strip() for key in _OPTIONAL_STRING_KEYS},
     )

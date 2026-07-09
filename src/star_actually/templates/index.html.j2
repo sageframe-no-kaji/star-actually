@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{ site.title }}</title>
-<link rel="stylesheet" href="/assets/style.css">
+<link rel="stylesheet" href="{{ site.base_path }}/assets/style.css">
 </head>
-<body class="entry">
+<body class="entry" data-base="{{ site.base_path }}">
 <main class="entry-screen">
   <h1 class="entry-title">{{ site.title }}</h1>
   <p class="entry-tagline">{{ site.tagline }}</p>
 
-  <form class="entry-prompt" id="ask-form" action="/help.html" method="get" data-receptionist="{{ 'on' if site.receptionist else 'off' }}">
+  <form class="entry-prompt" id="ask-form" action="{{ site.base_path }}/help.html" method="get" data-receptionist="{{ 'on' if site.receptionist else 'off' }}">
     <label class="prompt-label" for="ask">{{ site.prompt }}</label>
     <div class="prompt-line">
       <span class="prompt-glyph">&gt;</span>
@@ -25,11 +25,15 @@
 
   {% if root %}
   <p class="entry-start">
-    <a class="nav-node nav-root" data-node-id="{{ root.id }}" href="/n/{{ root.id }}/">&darr; or start at the beginning: {{ root.title }}</a>
+    <a class="nav-node nav-root" data-node-id="{{ root.id }}" href="{{ site.base_path }}/n/{{ root.id }}/">&darr; or start at the beginning: {{ root.title }}</a>
   </p>
   {% endif %}
 
-  <p class="entry-help"><a href="/help.html">? what is this place</a></p>
+  <p class="entry-help"><a href="{{ site.base_path }}/help.html">? what is this place</a></p>
+
+  {% if site.blurb %}
+  <p class="entry-about">{{ site.blurb }}{% if site.source_url %} <a class="entry-source" href="{{ site.source_url }}">{{ site.source_label or site.source_url }}</a>{% endif %}</p>
+  {% endif %}
 </main>
 
 <footer class="action-bar">
@@ -39,7 +43,7 @@
   <span class="key-hint"><kbd>?</kbd> help</span>
 </footer>
 
-<script src="/assets/htmx.min.js"></script>
-<script src="/assets/app.js"></script>
+<script src="{{ site.base_path }}/assets/htmx.min.js"></script>
+<script src="{{ site.base_path }}/assets/app.js"></script>
 </body>
 </html>

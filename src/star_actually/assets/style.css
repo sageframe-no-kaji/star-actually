@@ -186,6 +186,8 @@ hr { border: none; border-top: 1px solid var(--rule); margin: var(--step) 0; }
 
 .depth-label { color: var(--dim); }
 .depth-step { white-space: nowrap; }
+/* the unavailable direction stays in place, greyed and inert */
+.depth-step.is-disabled { color: var(--dim); pointer-events: none; }
 
 /* ── layers ─────────────────────────────────────────────────────────── */
 
@@ -243,7 +245,7 @@ hr { border: none; border-top: 1px solid var(--rule); margin: var(--step) 0; }
 .hood ul { list-style: none; margin: 0; padding: 0; }
 .hood li { margin: 0; }
 
-.nav-node { display: inline-block; padding: 0.1rem 0; }
+.nav-node { display: inline-block; padding: 0.25rem 0; font-size: 1.06em; }
 .nav-node .nav-key { color: var(--dim); }
 .nav-lateral { color: var(--fg); }
 .nav-lateral:hover { color: var(--accent); }
@@ -312,6 +314,8 @@ body.entry { justify-content: space-between; }
 .entry-start, .entry-help { margin-top: var(--step); }
 .entry-help a { color: var(--dim); }
 .entry-help a:hover { color: var(--accent); }
+.entry-about { color: var(--dim); max-width: 62ch; line-height: 1.55; margin-top: calc(var(--step) * 3); }
+.entry-source { color: var(--accent); }
 
 /* search results (ho-06 fills the container) */
 .entry-results { margin-top: var(--step); }

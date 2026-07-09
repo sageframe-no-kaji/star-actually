@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{ page_title }}</title>
-<link rel="stylesheet" href="/assets/style.css">
+<link rel="stylesheet" href="{{ site.base_path }}/assets/style.css">
 </head>
-<body>
+<body data-base="{{ site.base_path }}">
 <header class="site-head">
-  <a class="site-name" href="/">{{ site.title }}</a>
+  <a class="site-name" href="{{ site.base_path }}/">{{ site.title }}</a>
   <span class="site-tagline">{{ site.tagline }}</span>
 </header>
 
@@ -25,11 +25,11 @@
   <span class="key-hint"><kbd>+</kbd> surface</span>
   <span class="key-hint"><kbd>&rarr;</kbd> branch</span>
   <span class="key-hint"><kbd>&crarr;</kbd> return</span>
-  <span class="key-hint"><a href="/"><kbd>/</kbd> search</a></span>
-  <span class="key-hint"><a href="/help.html"><kbd>?</kbd> help</a></span>
+  <span class="key-hint"><a href="{{ site.base_path }}/"><kbd>/</kbd> search</a></span>
+  <span class="key-hint"><a href="{{ site.base_path }}/help.html"><kbd>?</kbd> help</a></span>
 </footer>
 
-<script src="/assets/htmx.min.js"></script>
-<script src="/assets/app.js"></script>
+<script src="{{ site.base_path }}/assets/htmx.min.js"></script>
+<script src="{{ site.base_path }}/assets/app.js"></script>
 </body>
 </html>

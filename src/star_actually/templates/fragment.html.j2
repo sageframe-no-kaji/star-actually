@@ -10,19 +10,27 @@
       <span class="node-type node-type-{{ node.type.value }}">{{ node.type.value }}</span>
     </div>
     <div class="depth-dial">
-      <span class="depth-gauge" aria-label="depth {{ depth }} of {{ node.depth_levels }}">
-        {%- for d in range(1, node.depth_levels + 1) -%}
+      {# Depth 1 is the name — it is the title above. The dial reads the body
+         layers (depths 2..N), shown to the reader as 1..N-1. #}
+      <span class="depth-gauge" aria-label="reading level {{ [depth - 1, 1] | max }} of {{ node.depth_levels - 1 }}">
+        {%- for d in range(2, node.depth_levels + 1) -%}
         <span class="gauge-cell{% if d <= depth %} lit{% endif %}"></span>
         {%- endfor -%}
       </span>
-      <span class="depth-label">depth {{ depth }}/{{ node.depth_levels }}</span>
+      <span class="depth-label">depth {{ [depth - 1, 1] | max }}/{{ node.depth_levels - 1 }}</span>
+      {# both controls always render in fixed slots; the unavailable direction
+         is present but disabled, so the click targets never move. #}
       {% if depth < node.depth_levels -%}
-      <a class="depth-step depth-deeper" href="/n/{{ node.id }}/d{{ depth + 1 }}/"
-         hx-get="/n/{{ node.id }}/d{{ depth + 1 }}.html" hx-target="#content" hx-swap="outerHTML">&minus; deeper</a>
+      <a class="depth-step depth-deeper" href="{{ site.base_path }}/n/{{ node.id }}/d{{ depth + 1 }}/"
+         hx-get="{{ site.base_path }}/n/{{ node.id }}/d{{ depth + 1 }}.html" hx-target="#content" hx-swap="outerHTML">&minus; deeper</a>
+      {%- else -%}
+      <span class="depth-step depth-deeper is-disabled" aria-disabled="true">&minus; deeper</span>
       {%- endif %}
-      {% if depth > 1 -%}
-      <a class="depth-step depth-shallower" href="/n/{{ node.id }}/d{{ depth - 1 }}/"
-         hx-get="/n/{{ node.id }}/d{{ depth - 1 }}.html" hx-target="#content" hx-swap="outerHTML">+ surface</a>
+      {% if depth > 2 -%}
+      <a class="depth-step depth-shallower" href="{{ site.base_path }}/n/{{ node.id }}/d{{ depth - 1 }}/"
+         hx-get="{{ site.base_path }}/n/{{ node.id }}/d{{ depth - 1 }}.html" hx-target="#content" hx-swap="outerHTML">+ surface</a>
+      {%- else -%}
+      <span class="depth-step depth-shallower is-disabled" aria-disabled="true">+ surface</span>
       {%- endif %}
     </div>
   </header>
@@ -41,9 +49,9 @@
       <h2 class="hood-label">onward</h2>
       <ul>
         {% for n in forward %}
-        <li><a class="nav-node nav-forward" data-node-id="{{ n.id }}" href="/n/{{ n.id }}/"
-               hx-get="/n/{{ n.id }}/d{{ 2 }}.html" hx-target="#content" hx-swap="outerHTML"
-               hx-push-url="/n/{{ n.id }}/">&darr; {{ n.title }}</a></li>
+        <li><a class="nav-node nav-forward" data-node-id="{{ n.id }}" href="{{ site.base_path }}/n/{{ n.id }}/"
+               hx-get="{{ site.base_path }}/n/{{ n.id }}/d{{ 2 }}.html" hx-target="#content" hx-swap="outerHTML"
+               hx-push-url="{{ site.base_path }}/n/{{ n.id }}/">&darr; {{ n.title }}</a></li>
         {% endfor %}
       </ul>
     </section>
@@ -52,10 +60,10 @@
     <section class="hood lateral">
       <h2 class="hood-label">lateral</h2>
       <ul>
-        {% for n in lateral %}
-        <li><a class="nav-node nav-lateral" data-node-id="{{ n.id }}" href="/n/{{ n.id }}/"
-               hx-get="/n/{{ n.id }}/d{{ 2 }}.html" hx-target="#content" hx-swap="outerHTML"
-               hx-push-url="/n/{{ n.id }}/">&rarr; {{ n.title }}</a></li>
+        {% for n in lateral[:10] %}
+        <li><a class="nav-node nav-lateral" data-node-id="{{ n.id }}" href="{{ site.base_path }}/n/{{ n.id }}/"
+               hx-get="{{ site.base_path }}/n/{{ n.id }}/d{{ 2 }}.html" hx-target="#content" hx-swap="outerHTML"
+               hx-push-url="{{ site.base_path }}/n/{{ n.id }}/">&rarr; {{ n.title }}</a></li>
         {% endfor %}
       </ul>
     </section>
@@ -64,10 +72,10 @@
     <section class="hood backlinks">
       <h2 class="hood-label">what points here</h2>
       <ul>
-        {% for n in backlinks %}
-        <li><a class="nav-node nav-backlink" data-node-id="{{ n.id }}" href="/n/{{ n.id }}/"
-               hx-get="/n/{{ n.id }}/d{{ 2 }}.html" hx-target="#content" hx-swap="outerHTML"
-               hx-push-url="/n/{{ n.id }}/">&uarr; {{ n.title }}</a></li>
+        {% for n in backlinks[:10] %}
+        <li><a class="nav-node nav-backlink" data-node-id="{{ n.id }}" href="{{ site.base_path }}/n/{{ n.id }}/"
+               hx-get="{{ site.base_path }}/n/{{ n.id }}/d{{ 2 }}.html" hx-target="#content" hx-swap="outerHTML"
+               hx-push-url="{{ site.base_path }}/n/{{ n.id }}/">&uarr; {{ n.title }}</a></li>
         {% endfor %}
       </ul>
     </section>

@@ -75,3 +75,19 @@ def test_receptionist_must_be_bool(tmp_path: Path) -> None:
     path.write_text(VALID + 'receptionist: "yes"\n', encoding="utf-8")
     with pytest.raises(ConfigError, match="true or false"):
         load_config(path)
+
+
+def test_optional_fields_default_empty(tmp_path: Path) -> None:
+    path = tmp_path / "site.yaml"
+    path.write_text(VALID, encoding="utf-8")
+    config = load_config(path)
+    assert config.blurb == ""
+    assert config.source_url == ""
+
+
+def test_optional_fields_load(tmp_path: Path) -> None:
+    path = tmp_path / "site.yaml"
+    path.write_text(VALID + 'blurb: "hi"\nsource_url: "https://x.net"\n', encoding="utf-8")
+    config = load_config(path)
+    assert config.blurb == "hi"
+    assert config.source_url == "https://x.net"

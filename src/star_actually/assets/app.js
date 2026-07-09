@@ -13,6 +13,9 @@
 (function () {
   "use strict";
 
+  /* URL prefix when the site is served under a subfolder (set in site.yaml). */
+  var BASE = (document.body && document.body.getAttribute("data-base")) || "";
+
   var STORE = "star-actually-journey";
 
   /* ── journey state ─────────────────────────────────────────────── */
@@ -84,12 +87,12 @@
   var suppressCount = 0;
 
   function swapTo(id, depth) {
-    if (!window.htmx) { window.location.href = "/n/" + id + "/"; return; }
-    htmx.ajax("GET", "/n/" + id + "/d" + depth + ".html", {
+    if (!window.htmx) { window.location.href = BASE + "/n/" + id + "/"; return; }
+    htmx.ajax("GET", BASE + "/n/" + id + "/d" + depth + ".html", {
       target: "#content",
       swap: "outerHTML"
     }).then(function () {
-      history.replaceState(null, "", "/n/" + id + "/");
+      history.replaceState(null, "", BASE + "/n/" + id + "/");
     });
   }
 
@@ -152,7 +155,8 @@
   }
 
   function dial(step) {
-    var link = firstLink(step > 0 ? ".depth-deeper" : ".depth-shallower");
+    /* only the live anchors dial; a disabled span at an extreme is ignored. */
+    var link = firstLink(step > 0 ? "a.depth-deeper" : "a.depth-shallower");
     if (link) link.click();
   }
 
@@ -182,7 +186,7 @@
       } else {
         var a = document.createElement("a");
         a.className = "rail-node";
-        a.href = "/n/" + visit.id + "/";
+        a.href = BASE + "/n/" + visit.id + "/";
         a.textContent = visit.title + " @" + visit.depth;
         a.addEventListener("click", function (ev) {
           ev.preventDefault();
@@ -244,10 +248,10 @@
           var input = document.querySelector(".prompt-input");
           if (input) input.focus();
         } else {
-          window.location.href = "/";
+          window.location.href = BASE + "/";
         }
         break;
-      case "?": window.location.href = "/help.html"; break;
+      case "?": window.location.href = BASE + "/help.html"; break;
       default: {
         var n = parseInt(ev.key, 10);
         if (n >= 1 && n <= 9) {
@@ -364,7 +368,7 @@
   var searchSeq = 0; /* stale async results must never land in a newer query */
 
   function fullText(query, container, seq) {
-    import("/pagefind/pagefind.js").then(function (pf) {
+    import(BASE + "/pagefind/pagefind.js").then(function (pf) {
       return pf.search(query);
     }).then(function (res) {
       return Promise.all(res.results.slice(0, 5).map(function (r) { return r.data(); }));
@@ -384,7 +388,7 @@
     if (!input || !results || !form) return;
 
     var catalog = [];
-    fetch("/catalog.json").then(function (r) { return r.json(); })
+    fetch(BASE + "/catalog.json").then(function (r) { return r.json(); })
       .then(function (data) { catalog = data.nodes; })
       .catch(function () { /* the ↓-to-begin path still works */ });
 
@@ -398,7 +402,7 @@
         .sort(function (a, b) { return b.s - a.s; })
         .slice(0, 5);
       scored.forEach(function (x) {
-        results.appendChild(resultLink("/n/" + x.n.id + "/", x.n.title, x.n.summary));
+        results.appendChild(resultLink(BASE + "/n/" + x.n.id + "/", x.n.title, x.n.summary));
       });
       if (scored.length < 3 && input.value.length > 3) {
         fullText(input.value, results, searchSeq);
@@ -421,7 +425,7 @@
       };
       var controller = new AbortController();
       var timer = setTimeout(function () { controller.abort(); }, 1500);
-      fetch("/ask", {
+      fetch(BASE + "/ask", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ question: input.value }),
@@ -431,7 +435,7 @@
         if (!r.ok) throw new Error("no receptionist");
         return r.json();
       }).then(function (a) {
-        window.location.href = "/n/" + a.node_id + "/?d=" + a.depth;
+        window.location.href = BASE + "/n/" + a.node_id + "/?d=" + a.depth;
       }).catch(fallback);
     });
   }

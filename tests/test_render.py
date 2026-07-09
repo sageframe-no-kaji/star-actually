@@ -111,15 +111,27 @@ class TestRenderSite:
         assert 'href="/n/child-idea/"' in fragment  # noscript floor
 
     def test_depth_dial_links(self, synthetic_root: Path) -> None:
-        """Depth is water: minus dials down (deeper), plus surfaces (seed §7)."""
+        """The name is depth 1 (the title). The dial reads the body layers,
+        shown as depth 1..N-1; surface floors on the definition, never empty.
+        Both controls stay in fixed slots; the unavailable one is disabled.
+        """
         out = synthetic_root / "dist"
         render_site(synthetic_root, out)
-        d1 = (out / "n" / "root-idea" / "d1.html").read_text(encoding="utf-8")
+        d2 = (out / "n" / "root-idea" / "d2.html").read_text(encoding="utf-8")
         d3 = (out / "n" / "root-idea" / "d3.html").read_text(encoding="utf-8")
-        assert "&minus; deeper" in d1
-        assert "+ surface" not in d1
-        assert "&minus; deeper" not in d3
-        assert "+ surface" in d3
+        # body layers 2..3 read to the reader as 1..2
+        assert "depth 1/2" in d2
+        assert "depth 2/2" in d3
+        # nothing reflows: both controls present at every depth
+        for frag in (d2, d3):
+            assert "&minus; deeper" in frag
+            assert "+ surface" in frag
+        # the floor (d2) is the definition: surface disabled, deeper live
+        assert "depth-shallower is-disabled" in d2
+        assert "depth-deeper is-disabled" not in d2
+        # deep end (d3): deeper disabled, surface live
+        assert "depth-deeper is-disabled" in d3
+        assert "depth-shallower is-disabled" not in d3
 
     def test_entry_screen(self, synthetic_root: Path) -> None:
         out = synthetic_root / "dist"
@@ -142,6 +154,28 @@ class TestRenderSite:
         entry = (out / "index.html").read_text(encoding="utf-8")
         assert 'data-receptionist="on"' in entry
         assert "&crarr;</kbd> ask" in entry
+
+    def test_entry_blurb_and_source(self, synthetic_root: Path) -> None:
+        (synthetic_root / "site.yaml").write_text(
+            SITE + 'blurb: "what this is"\nsource_url: "https://src.net"\nsource_label: "src"\n',
+            encoding="utf-8",
+        )
+        out = synthetic_root / "dist"
+        render_site(synthetic_root, out)
+        entry = (out / "index.html").read_text(encoding="utf-8")
+        assert "what this is" in entry
+        assert 'href="https://src.net"' in entry
+        assert ">src</a>" in entry
+
+    def test_base_path_prefixes_internal_urls(self, synthetic_root: Path) -> None:
+        (synthetic_root / "site.yaml").write_text(SITE + 'base_path: "/sub"\n', encoding="utf-8")
+        out = synthetic_root / "dist"
+        render_site(synthetic_root, out)
+        entry = (out / "index.html").read_text(encoding="utf-8")
+        assert 'href="/sub/assets/style.css"' in entry
+        assert 'data-base="/sub"' in entry
+        frag = (out / "n" / "root-idea" / "d2.html").read_text(encoding="utf-8")
+        assert 'href="/sub/n/' in frag  # nav + dial links carry the prefix
 
     def test_catalog(self, synthetic_root: Path) -> None:
         out = synthetic_root / "dist"
