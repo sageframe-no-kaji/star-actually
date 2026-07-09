@@ -5,4 +5,4 @@ navigable knowledge site. Domain-blind by design: everything it knows about
 the subject matter arrives through ``nodes/`` and ``site.yaml``.
 """
 
-__version__ = "0.3.0"
+__version__ = "0.3.1"

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "star-actually"
-version = "0.3.0"
+version = "0.3.1"
 description = "The Loom + Terminal + Receptionist for *, Actually — weaves depth-layered markdown nodes into fully static, navigable, terminal-aesthetic knowledge sites. Domain-blind: instances supply nodes/ and site.yaml."
 readme = "README.md"
 requires-python = ">=3.12"
