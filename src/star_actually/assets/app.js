@@ -172,17 +172,22 @@
     var path = journey.path;
     if (!path.length) return;
 
+    /* The path scrolls inside its own track; the return chip is pinned as a
+       sibling of the track (see .rail-return in the CSS) so it stays put. */
+    var track = document.createElement("div");
+    track.className = "rail-track";
+
     var start = Math.max(0, path.length - RAIL_SHOWN);
     if (start > 0) {
-      rail.appendChild(span("rail-node", "…"));
-      rail.appendChild(span("rail-sep", "›"));
+      track.appendChild(span("rail-node", "…"));
+      track.appendChild(span("rail-sep", "›"));
     }
 
     path.forEach(function (visit, i) {
       if (i < start) return;
-      if (i > start) rail.appendChild(span("rail-sep", "›"));
+      if (i > start) track.appendChild(span("rail-sep", "›"));
       if (i === path.length - 1) {
-        rail.appendChild(span("rail-here", "▶ " + visit.title + " @" + visit.depth));
+        track.appendChild(span("rail-here", "▶ " + visit.title + " @" + visit.depth));
       } else {
         var a = document.createElement("a");
         a.className = "rail-node";
@@ -192,21 +197,28 @@
           ev.preventDefault();
           goRailIndex(i);
         });
-        rail.appendChild(a);
+        track.appendChild(a);
       }
     });
+
+    if (path.length === 1 && !journey.branches.length) {
+      /* First arrival: give the reader something to stand on. */
+      track.appendChild(span("rail-note", "  — the start of your path; it grows as you move"));
+    }
+
+    rail.appendChild(track);
 
     if (journey.branches.length) {
       var b = journey.branches[journey.branches.length - 1];
       var origin = path[b];
       if (origin) {
-        var chip = span("rail-return", "↩ return to " + origin.title + " @" + origin.depth);
-        rail.appendChild(chip);
+        rail.appendChild(span("rail-return", "↩ return to " + origin.title + " @" + origin.depth));
       }
-    } else if (path.length === 1) {
-      /* First arrival: give the reader something to stand on. */
-      rail.appendChild(span("rail-note", "  — the start of your path; it grows as you move"));
     }
+
+    /* Keep the current node (the end of the track) in view; the pinned chip
+       sits just past it rather than scrolling the head of the path away. */
+    track.scrollLeft = track.scrollWidth;
   }
 
   function span(cls, text) {
