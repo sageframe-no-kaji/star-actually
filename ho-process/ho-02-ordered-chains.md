@@ -4,7 +4,7 @@ shape: ha
 title: Ordered chains — a generic sequence primitive
 project: star-actually (engine)
 created: 2026-07-10
-status: open
+status: closed
 builds-on: [ho-01-receptionist-config]
 ---
 
@@ -98,8 +98,32 @@ Those are instance/content work, tracked separately.
 
 ## Reflect
 
-_To fill on close — what the build surfaced, what the design didn't anticipate,
-what changes for the instance work that consumes this._
+Built as two agent tasks (AT-01 floor, AT-02 client), both green first pass —
+`make verify` at 97.46% coverage, `chains.py` and `render.py` at 100%. Browser
+check done against a synthetic three-node instance. What the build surfaced:
+
+- **Spec gap caught in pre-dispatch review:** `validate_chains` as first
+  drafted returned warnings only, while the render path consumed the raw
+  `site.chains` — under `allow_dangling` a dropped member would still have
+  rendered as a prev/next link to a nonexistent page. Fixed before dispatch:
+  the validator returns `(validated_chains, warnings)` and the renderer
+  consumes only the validated set.
+- **Implementation judgment calls** (all accepted): `Chain` lives in
+  `config.py` as the config-owned type, `chains.py` imports it; chain nav
+  links hardcode `d2.html`, matching the template's existing literal-2
+  convention on `.nav-node`; the strip renders as separate elements (title,
+  k/n, two controls) mirroring the dial's structure rather than the literal
+  `‹ › ·` glyph sketch in Decision 4.
+- **Help-page gap:** `help.html.j2` lists every key; `[`/`]` are not on it.
+  Undecided whether to list them unconditionally or only when `site.chains`
+  is non-empty (they are inert on a chainless instance; conditional is the
+  recommendation). Next ho that touches the help page picks this up.
+- **`app.js` is at 479 lines**, over the ~450 ruling recorded in ho-01. The
+  chain addition was +10; no compensating refactor was done. A future ho
+  owns that decision.
+- **For the instance work:** stars pin the engine by git tag, so consuming
+  this requires the `v0.4.0` tag plus a pin bump per star before any
+  `chains:` declaration does anything.
 
 ## Closing this ho
 
