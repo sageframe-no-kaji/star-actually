@@ -160,6 +160,14 @@
     if (link) link.click();
   }
 
+  /* Chain nav: acts on the first strip only (Decision 6 — a node in several
+     chains keeps the rest mouse-navigable). A disabled span at an end is
+     ignored, same fixed-slot discipline as the depth dial. */
+  function chainStep(dir) {
+    var link = firstLink(dir > 0 ? "a.chain-next" : "a.chain-prev");
+    if (link) link.click();
+  }
+
   /* ── the rail ──────────────────────────────────────────────────── */
 
   var RAIL_SHOWN = 5;
@@ -251,6 +259,8 @@
       /* Depth is water: − dials down (deeper), + surfaces. Seed §7. */
       case "-": case "_": dial(1); break;
       case "+": case "=": dial(-1); break;
+      case "[": chainStep(-1); break;
+      case "]": chainStep(1); break;
       case "ArrowDown": case "j": goOnward(); break;
       case "ArrowUp": case "k": goBack(); break;
       case "ArrowRight": case "l": goBranch(); break;

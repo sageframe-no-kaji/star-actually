@@ -198,6 +198,25 @@ hr { border: none; border-top: 1px solid var(--rule); margin: var(--step) 0; }
 /* the unavailable direction stays in place, greyed and inert */
 .depth-step.is-disabled { color: var(--dim); pointer-events: none; }
 
+/* A chain is positional the way depth is positional: a compact line under
+   the dial, same fixed-slot discipline. Stacked strips (a node in several
+   chains) read as a short list, not a wall. */
+.chain-strip {
+  display: flex;
+  align-items: baseline;
+  gap: 2ch;
+  margin-top: calc(var(--step) / 4);
+  font-size: 0.86em;
+}
+.chain-strip + .chain-strip { margin-top: calc(var(--step) / 3); }
+
+.chain-title { color: var(--dim); }
+.chain-position { color: var(--accent); }
+.chain-step { white-space: nowrap; }
+/* the unavailable direction stays in place, greyed and inert — mirrors
+   .depth-step.is-disabled above. */
+.chain-step.is-disabled { color: var(--dim); pointer-events: none; }
+
 /* ── layers ─────────────────────────────────────────────────────────── */
 
 .layer {
