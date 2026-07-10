@@ -248,6 +248,28 @@ class TestRenderSite:
         frag = (out / "n" / "root-idea" / "d2.html").read_text(encoding="utf-8")
         assert "chain-strip" not in frag
 
+    def test_help_lists_chain_keys_only_when_chains_declared(self, synthetic_root: Path) -> None:
+        """The [ / ] keys are inert on a chainless instance, so the help page
+        lists them only when site.yaml declares a chain."""
+        out = synthetic_root / "dist"
+        render_site(synthetic_root, out)
+        help_html = (out / "help.html").read_text(encoding="utf-8")
+        assert "<kbd>[</kbd>" not in help_html
+
+        site = (synthetic_root / "site.yaml").read_text(encoding="utf-8")
+        (synthetic_root / "site.yaml").write_text(
+            site
+            + "chains:\n"
+            + '  - id: "kamae"\n'
+            + '    title: "The Kamae chain"\n'
+            + '    nodes: ["root-idea", "child-idea"]\n',
+            encoding="utf-8",
+        )
+        render_site(synthetic_root, out)
+        help_html = (out / "help.html").read_text(encoding="utf-8")
+        assert "<kbd>[</kbd>" in help_html
+        assert "<kbd>]</kbd>" in help_html
+
     def test_dangling_chain_member_fails_strict(self, synthetic_root: Path) -> None:
         site = (synthetic_root / "site.yaml").read_text(encoding="utf-8")
         (synthetic_root / "site.yaml").write_text(

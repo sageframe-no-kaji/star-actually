@@ -23,6 +23,10 @@
         <li><kbd>&uarr;</kbd> — back along your path, to the depth you left</li>
         <li><kbd>&rarr;</kbd> — branch: a lateral detour</li>
         <li><kbd>&crarr;</kbd> — return from a branch to exactly where you left</li>
+        {% if site.chains -%}
+        <li><kbd>[</kbd> — chain: the previous step in the sequence</li>
+        <li><kbd>]</kbd> — chain: the next step</li>
+        {%- endif %}
         <li><kbd>/</kbd> — search everything</li>
         <li><kbd>?</kbd> — this screen</li>
       </ul>

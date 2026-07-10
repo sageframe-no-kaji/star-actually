@@ -154,17 +154,12 @@
     swapTo(target.id, target.depth);
   }
 
-  function dial(step) {
-    /* only the live anchors dial; a disabled span at an extreme is ignored. */
-    var link = firstLink(step > 0 ? "a.depth-deeper" : "a.depth-shallower");
-    if (link) link.click();
-  }
-
-  /* Chain nav: acts on the first strip only (Decision 6 — a node in several
-     chains keeps the rest mouse-navigable). A disabled span at an end is
-     ignored, same fixed-slot discipline as the depth dial. */
-  function chainStep(dir) {
-    var link = firstLink(dir > 0 ? "a.chain-next" : "a.chain-prev");
+  /* Dial and chain nav share one shape: click the first live anchor; a
+     disabled span in the same fixed slot is ignored. Chain keys act on the
+     first strip only — a node in several chains keeps the rest
+     mouse-navigable (ho-02 Decision 6). */
+  function clickFirst(selector) {
+    var link = firstLink(selector);
     if (link) link.click();
   }
 
@@ -257,10 +252,10 @@
 
     switch (ev.key) {
       /* Depth is water: − dials down (deeper), + surfaces. Seed §7. */
-      case "-": case "_": dial(1); break;
-      case "+": case "=": dial(-1); break;
-      case "[": chainStep(-1); break;
-      case "]": chainStep(1); break;
+      case "-": case "_": clickFirst("a.depth-deeper"); break;
+      case "+": case "=": clickFirst("a.depth-shallower"); break;
+      case "[": clickFirst("a.chain-prev"); break;
+      case "]": clickFirst("a.chain-next"); break;
       case "ArrowDown": case "j": goOnward(); break;
       case "ArrowUp": case "k": goBack(); break;
       case "ArrowRight": case "l": goBranch(); break;
