@@ -33,6 +33,31 @@
       <span class="depth-step depth-shallower is-disabled" aria-disabled="true">+ surface</span>
       {%- endif %}
     </div>
+    {% for link in chains %}
+    <div class="chain-strip" data-chain-id="{{ link.chain_id }}">
+      <span class="chain-title">{{ link.title }}</span>
+      <span class="chain-position">{{ link.index }}/{{ link.total }}</span>
+      {# both controls always render in fixed slots; the unavailable direction
+         is present but disabled, so the click targets never move — mirrors
+         the depth dial's discipline above. #}
+      {% if link.prev -%}
+      <a class="chain-step chain-prev" data-chain-id="{{ link.chain_id }}"
+         href="{{ site.base_path }}/n/{{ link.prev }}/"
+         hx-get="{{ site.base_path }}/n/{{ link.prev }}/d{{ 2 }}.html" hx-target="#content" hx-swap="outerHTML"
+         hx-push-url="{{ site.base_path }}/n/{{ link.prev }}/">&larr; prev</a>
+      {%- else -%}
+      <span class="chain-step chain-prev is-disabled" aria-disabled="true">&larr; prev</span>
+      {%- endif %}
+      {% if link.next -%}
+      <a class="chain-step chain-next" data-chain-id="{{ link.chain_id }}"
+         href="{{ site.base_path }}/n/{{ link.next }}/"
+         hx-get="{{ site.base_path }}/n/{{ link.next }}/d{{ 2 }}.html" hx-target="#content" hx-swap="outerHTML"
+         hx-push-url="{{ site.base_path }}/n/{{ link.next }}/">next &rarr;</a>
+      {%- else -%}
+      <span class="chain-step chain-next is-disabled" aria-disabled="true">next &rarr;</span>
+      {%- endif %}
+    </div>
+    {% endfor %}
   </header>
 
   <div class="layers">

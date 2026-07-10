@@ -20,7 +20,8 @@ from pathlib import Path
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from markdown_it import MarkdownIt
 
-from star_actually.config import ConfigError, SiteConfig, load_config
+from star_actually.chains import links_for, validate_chains
+from star_actually.config import Chain, ConfigError, SiteConfig, load_config
 from star_actually.graph import Graph, build_catalog, build_graph
 from star_actually.nodes import Node, load_nodes
 
@@ -66,6 +67,7 @@ def _render_fragment(
     site: SiteConfig,
     node: Node,
     depth: int,
+    chains: tuple[Chain, ...],
 ) -> str:
     hood = graph.neighborhoods[node.id]
     layers = [
@@ -81,6 +83,7 @@ def _render_fragment(
         forward=_titles(graph, hood.forward),
         lateral=_titles(graph, hood.lateral),
         backlinks=_titles(graph, hood.backlinks) if depth >= 4 else [],
+        chains=links_for(node.id, chains),
     )
 
 
@@ -94,6 +97,9 @@ def render_site(
     site = load_config(root / "site.yaml")
     nodes = load_nodes(root / "nodes")
     graph = build_graph(nodes, allow_dangling=allow_dangling)
+    validated_chains, chain_warnings = validate_chains(
+        site.chains, set(graph.nodes), allow_dangling=allow_dangling
+    )
     env = _environment(TEMPLATES_DIR)
     md = _markdown()
 
@@ -108,7 +114,7 @@ def render_site(
         node_dir = out_dir / "n" / node.id
         node_dir.mkdir(parents=True)
         for depth in range(1, node.depth_levels + 1):
-            fragment = _render_fragment(env, md, graph, site, node, depth)
+            fragment = _render_fragment(env, md, graph, site, node, depth, validated_chains)
             (node_dir / f"d{depth}.html").write_text(fragment, encoding="utf-8")
             fragments += 1
 
@@ -128,7 +134,7 @@ def render_site(
         page = env.get_template("base.html.j2").render(
             site=site,
             page_title=f"{node.title} · {site.title}",
-            content=_render_fragment(env, md, graph, site, node, landing),
+            content=_render_fragment(env, md, graph, site, node, landing, validated_chains),
         )
         (node_dir / "index.html").write_text(page, encoding="utf-8")
         pages += 1
@@ -137,7 +143,9 @@ def render_site(
         corpus = env.get_template("base.html.j2").render(
             site=site,
             page_title=f"{node.title} · {site.title}",
-            content=_render_fragment(env, md, graph, site, node, node.depth_levels),
+            content=_render_fragment(
+                env, md, graph, site, node, node.depth_levels, validated_chains
+            ),
         )
         (node_dir / "full.html").write_text(corpus, encoding="utf-8")
 
@@ -166,5 +174,6 @@ def render_site(
     warnings = list(graph.warnings)
     if root_node is None:
         warnings.append(f"root node {site.root_node!r} does not exist yet; entry links degrade")
+    warnings.extend(chain_warnings)
 
     return RenderResult(pages=pages + 2, fragments=fragments, warnings=tuple(warnings))

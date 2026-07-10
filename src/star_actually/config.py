@@ -6,14 +6,32 @@ arrives through ``site.yaml``. The engine itself stays domain-blind.
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from pathlib import Path
 
 import yaml
 
+# Reuses nodes.py's kebab-case contract for identifiers declared in site.yaml.
+_ID_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
+
 
 class ConfigError(Exception):
     """A site.yaml that violates the schema."""
+
+
+@dataclass(frozen=True)
+class Chain:
+    """An ordered sequence of node ids — a generic sequence primitive.
+
+    Shape-validated here (kebab id, non-empty title, non-empty deduplicated
+    nodes list). Member existence against the node set is validated later, in
+    chains.py, where the node set is actually known.
+    """
+
+    id: str
+    title: str
+    nodes: tuple[str, ...]
 
 
 @dataclass(frozen=True)
@@ -34,6 +52,7 @@ class SiteConfig:
     source_url: str = ""  # link to the canonical source of the content
     source_label: str = ""  # link text for source_url
     base_path: str = ""  # URL prefix when served under a subfolder, e.g. /ssh-actually
+    chains: tuple[Chain, ...] = ()  # ordered sequences over nodes/, optional
 
 
 # The domain strings every site.yaml must supply. `receptionist` is the one
@@ -55,6 +74,51 @@ _STRING_KEYS = (
 _OPTIONAL_STRING_KEYS = ("blurb", "source_url", "source_label", "base_path")
 
 
+def _parse_chains(path: Path, raw: object) -> tuple[Chain, ...]:
+    """Shape-validate ``chains:``. No existence check — that needs the node set."""
+    if not isinstance(raw, list):
+        raise ConfigError(f"{path.name}: key 'chains' must be a list")
+
+    chains: list[Chain] = []
+    seen_ids: set[str] = set()
+    for item in raw:
+        if not isinstance(item, dict):
+            raise ConfigError(f"{path.name}: each chain must be a mapping")
+        extra = set(item) - {"id", "title", "nodes"}
+        missing = {"id", "title", "nodes"} - set(item)
+        if extra or missing:
+            raise ConfigError(
+                f"{path.name}: chain {item!r} must have exactly keys 'id', 'title', 'nodes'"
+            )
+
+        chain_id = item["id"]
+        if not isinstance(chain_id, str) or not _ID_RE.match(chain_id):
+            raise ConfigError(f"{path.name}: chain id {chain_id!r} is not kebab-case")
+        if chain_id in seen_ids:
+            raise ConfigError(f"{path.name}: duplicate chain id {chain_id!r}")
+        seen_ids.add(chain_id)
+
+        title = item["title"]
+        if not isinstance(title, str) or not title.strip():
+            raise ConfigError(f"{path.name}: chain {chain_id!r} title must be a non-empty string")
+
+        nodes_raw = item["nodes"]
+        if (
+            not isinstance(nodes_raw, list)
+            or not nodes_raw
+            or not all(isinstance(n, str) for n in nodes_raw)
+        ):
+            raise ConfigError(
+                f"{path.name}: chain {chain_id!r} nodes must be a non-empty list of strings"
+            )
+        if len(set(nodes_raw)) != len(nodes_raw):
+            raise ConfigError(f"{path.name}: chain {chain_id!r} has a duplicate node in nodes")
+
+        chains.append(Chain(id=chain_id, title=title.strip(), nodes=tuple(nodes_raw)))
+
+    return tuple(chains)
+
+
 def load_config(path: Path) -> SiteConfig:
     """Load and validate site.yaml."""
     if not path.exists():
@@ -63,7 +127,7 @@ def load_config(path: Path) -> SiteConfig:
     if not isinstance(data, dict):
         raise ConfigError(f"{path.name}: must be a YAML mapping")
 
-    known = set(_STRING_KEYS) | set(_OPTIONAL_STRING_KEYS) | {"receptionist"}
+    known = set(_STRING_KEYS) | set(_OPTIONAL_STRING_KEYS) | {"receptionist", "chains"}
     unknown = set(data) - known
     if unknown:
         raise ConfigError(f"{path.name}: unknown keys: {sorted(unknown)}")
@@ -81,8 +145,11 @@ def load_config(path: Path) -> SiteConfig:
         if key in data and not isinstance(data[key], str):
             raise ConfigError(f"{path.name}: key {key!r} must be a string")
 
+    chains = _parse_chains(path, data["chains"]) if "chains" in data else ()
+
     return SiteConfig(
         receptionist=receptionist,
+        chains=chains,
         **{key: str(data[key]).strip() for key in _STRING_KEYS},
         **{key: str(data.get(key, "")).strip() for key in _OPTIONAL_STRING_KEYS},
     )

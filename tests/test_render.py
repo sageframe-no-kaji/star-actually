@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 
 from star_actually.cli import main
+from star_actually.config import ConfigError
 from star_actually.render import render_site
 
 ROOT_NODE = """\
@@ -186,8 +187,6 @@ class TestRenderSite:
 
     def test_missing_root_node_fails_strict(self, synthetic_root: Path) -> None:
         """A typo'd root_node must never ship silently (review finding 5)."""
-        from star_actually.config import ConfigError
-
         site = (synthetic_root / "site.yaml").read_text(encoding="utf-8")
         (synthetic_root / "site.yaml").write_text(
             site.replace('root_node: "root-idea"', 'root_node: "ghost-root"'),
@@ -197,6 +196,88 @@ class TestRenderSite:
             render_site(synthetic_root, synthetic_root / "dist")
         result = render_site(synthetic_root, synthetic_root / "dist", allow_dangling=True)
         assert any("ghost-root" in w for w in result.warnings)
+
+    def test_chain_strip_renders_with_prev_next(self, synthetic_root: Path) -> None:
+        """A member in the middle of a chain gets working prev/next links,
+        the correct k/n, and no disabled controls (Ho-02-AT-01)."""
+        site = (synthetic_root / "site.yaml").read_text(encoding="utf-8")
+        (synthetic_root / "site.yaml").write_text(
+            site
+            + "chains:\n"
+            + '  - id: "kamae"\n'
+            + '    title: "The Kamae chain"\n'
+            + '    nodes: ["root-idea", "child-idea"]\n',
+            encoding="utf-8",
+        )
+        out = synthetic_root / "dist"
+        render_site(synthetic_root, out)
+        root_frag = (out / "n" / "root-idea" / "d2.html").read_text(encoding="utf-8")
+        assert 'class="chain-strip" data-chain-id="kamae"' in root_frag
+        assert "The Kamae chain" in root_frag
+        assert "1/2" in root_frag
+        assert 'href="/n/child-idea/"' in root_frag
+        assert 'hx-get="/n/child-idea/d2.html"' in root_frag
+        assert "chain-prev is-disabled" in root_frag
+        assert "chain-next is-disabled" not in root_frag
+
+        child_frag = (out / "n" / "child-idea" / "d2.html").read_text(encoding="utf-8")
+        assert "2/2" in child_frag
+        assert 'href="/n/root-idea/"' in child_frag
+        assert "chain-next is-disabled" in child_frag
+        assert "chain-prev is-disabled" not in child_frag
+
+    def test_node_in_two_chains_renders_two_strips(self, synthetic_root: Path) -> None:
+        site = (synthetic_root / "site.yaml").read_text(encoding="utf-8")
+        (synthetic_root / "site.yaml").write_text(
+            site
+            + "chains:\n"
+            + '  - id: "first"\n    title: "First chain"\n    nodes: ["root-idea", "child-idea"]\n'
+            + '  - id: "second"\n    title: "Second chain"\n    nodes: ["root-idea"]\n',
+            encoding="utf-8",
+        )
+        out = synthetic_root / "dist"
+        render_site(synthetic_root, out)
+        frag = (out / "n" / "root-idea" / "d2.html").read_text(encoding="utf-8")
+        assert frag.count('class="chain-strip"') == 2
+        assert "First chain" in frag
+        assert "Second chain" in frag
+
+    def test_config_without_chains_renders_no_strip(self, synthetic_root: Path) -> None:
+        out = synthetic_root / "dist"
+        render_site(synthetic_root, out)
+        frag = (out / "n" / "root-idea" / "d2.html").read_text(encoding="utf-8")
+        assert "chain-strip" not in frag
+
+    def test_dangling_chain_member_fails_strict(self, synthetic_root: Path) -> None:
+        site = (synthetic_root / "site.yaml").read_text(encoding="utf-8")
+        (synthetic_root / "site.yaml").write_text(
+            site
+            + "chains:\n"
+            + '  - id: "kamae"\n    title: "K"\n    nodes: ["root-idea", "ghost-node"]\n',
+            encoding="utf-8",
+        )
+        with pytest.raises(ConfigError, match="ghost-node"):
+            render_site(synthetic_root, synthetic_root / "dist")
+
+    def test_dangling_chain_member_drops_with_warning_under_allow_dangling(
+        self, synthetic_root: Path
+    ) -> None:
+        site = (synthetic_root / "site.yaml").read_text(encoding="utf-8")
+        (synthetic_root / "site.yaml").write_text(
+            site
+            + "chains:\n"
+            + '  - id: "kamae"\n    title: "K"\n    nodes: ["root-idea", "ghost-node"]\n',
+            encoding="utf-8",
+        )
+        out = synthetic_root / "dist"
+        result = render_site(synthetic_root, out, allow_dangling=True)
+        assert any("ghost-node" in w for w in result.warnings)
+        frag = (out / "n" / "root-idea" / "d2.html").read_text(encoding="utf-8")
+        # the surviving member renders as a 1/1 chain — both ends disabled
+        assert "1/1" in frag
+        assert "chain-prev is-disabled" in frag
+        assert "chain-next is-disabled" in frag
+        assert "ghost-node" not in frag
 
     def test_depth_pages_exist(self, synthetic_root: Path) -> None:
         """Every depth is a full page too — the no-JS dial lands on chrome."""
