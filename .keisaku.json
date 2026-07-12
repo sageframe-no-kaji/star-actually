@@ -1,0 +1,73 @@
+{
+  "keisaku": 1,
+  "works": [
+    {
+      "id": "star-actually",
+      "name": "*, Actually",
+      "hero": "Enter with a question, navigate by relationship, stop when you understand enough.",
+      "importance": 6,
+      "featured": true,
+      "group": "knowledge-architecture",
+      "themes": [
+        "knowledge",
+        "attention"
+      ],
+      "sort_order_within_group": 10,
+      "tags": [
+        "methodology",
+        "knowledge-architecture",
+        "progressive-disclosure",
+        "published"
+      ],
+      "media": [
+        "methodology"
+      ],
+      "status": "published",
+      "repo": "git@github-no-kaji:sageframe-no-kaji/star-actually.git",
+      "license": "MIT",
+      "deployment": [
+        {
+          "label": "First instance — SSH, Actually",
+          "url": "https://github.com/sageframe-no-kaji/ssh-actually"
+        }
+      ],
+      "tech_stack": "Python (pyyaml, markdown-it-py, jinja2)",
+      "created": "2026-03-15",
+      "last_updated": "2026-07-10",
+      "conceived": "2026-04-12",
+      "short_description": "Domain-agnostic system for making relational technical knowledge navigable: enter with a question, navigate by concept relationship, stop when you understand enough. Progressive-disclosure design — every concept has depth layers (name, definition, usage, relationships, full theory) and the reader controls how far they go rather than being forced through a linear document. Organized around mental models and questions, not product features or chapters. SSH, Actually is the first complete content set. Replicable across any field where understanding concept relationships matters more than memorizing isolated facts.",
+      "substantive_description": [
+        "Most technical documentation is written by the people who built the thing for the people who already understand the field. The result is reference material that fails the actual job of getting someone from I have a question to I understand enough to act. *, Actually is the answer in methodology form: organize knowledge by question and relationship rather than by product surface. Let the reader dial the depth they need. Make the mental models explicit before the commands. Be honest about where the subject is confusing.",
+        "The deeper argument is about the relationship between knowledge architecture and reader agency. The reader of a typical man page has no agency — the content was structured for an internal logic that has nothing to do with what the reader wants to know. *, Actually is what reader agency looks like when the architecture is built to support it."
+      ],
+      "images": {
+        "gallery": []
+      },
+      "_keisaku": {
+        "generated_at": "2026-07-11T13:34:16",
+        "generator_version": "1",
+        "sources": {
+          "readme": "README.md",
+          "manifest": "pyproject.toml"
+        },
+        "derived_defaults": {
+          "id": "star-actually",
+          "name": "star-actually",
+          "media": [
+            "software"
+          ],
+          "created": "2026-07-08",
+          "tags": [
+            "python",
+            "pyyaml",
+            "markdown-it-py",
+            "jinja2"
+          ]
+        },
+        "contract_issues": [
+          "no-contract-source"
+        ]
+      }
+    }
+  ]
+}
