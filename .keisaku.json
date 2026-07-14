@@ -27,27 +27,39 @@
       "license": "MIT",
       "deployment": [
         {
-          "label": "First instance — SSH, Actually",
-          "url": "https://github.com/sageframe-no-kaji/ssh-actually"
+          "label": "*, Actually site",
+          "url": "https://star-actually.sageframe.net",
+          "role": "production"
+        },
+        {
+          "label": "SSH, Actually edition",
+          "url": "https://star-actually.sageframe.net/ssh-actually/",
+          "role": "production"
+        },
+        {
+          "label": "Ho, Actually edition",
+          "url": "https://star-actually.sageframe.net/ho-actually/",
+          "role": "production"
         }
       ],
       "tech_stack": "Python (pyyaml, markdown-it-py, jinja2)",
       "created": "2026-03-15",
       "last_updated": "2026-07-10",
       "conceived": "2026-04-12",
-      "short_description": "Domain-agnostic system for making relational technical knowledge navigable: enter with a question, navigate by concept relationship, stop when you understand enough. Progressive-disclosure design — every concept has depth layers (name, definition, usage, relationships, full theory) and the reader controls how far they go rather than being forced through a linear document. Organized around mental models and questions, not product features or chapters. SSH, Actually is the first complete content set. Replicable across any field where understanding concept relationships matters more than memorizing isolated facts.",
+      "short_description": "A domain-blind engine that weaves a directory of depth-layered markdown into a fully static, navigable, terminal-aesthetic knowledge site.",
       "substantive_description": [
-        "Most technical documentation is written by the people who built the thing for the people who already understand the field. The result is reference material that fails the actual job of getting someone from I have a question to I understand enough to act. *, Actually is the answer in methodology form: organize knowledge by question and relationship rather than by product surface. Let the reader dial the depth they need. Make the mental models explicit before the commands. Be honest about where the subject is confusing.",
-        "The deeper argument is about the relationship between knowledge architecture and reader agency. The reader of a typical man page has no agency — the content was structured for an internal logic that has nothing to do with what the reader wants to know. *, Actually is what reader agency looks like when the architecture is built to support it."
+        "Most technical documentation is written by the people who built the thing for the people who already understand the field, and it fails the actual job: getting someone from \"I have a question\" to \"I understand enough to act.\" *, Actually is the answer, and star-actually is its engine — a build system that renders knowledge organized by question and relationship rather than by product surface, giving every concept depth layers (name, definition, usage, relationships, full theory) the reader can dial through at will. The engine is domain-blind: it never mentions any subject, and everything specific arrives from an instance repo through two files — a site.yaml and a directory of depth-layered markdown nodes. It has three parts: the Loom parses and validates the node graph and renders the static site; the Terminal is the reading experience — HTML, CSS, one vanilla JavaScript file, and vendored htmx, with zero external requests; and the Receptionist is an optional FastAPI service that maps a natural-language question to an entry node, with the site degrading gracefully to a browsable graph and full-text search when it is absent. The deeper argument is about reader agency: the reader of a typical man page has none, and *, Actually is what reader agency looks like when the architecture is built to support it. SSH, Actually and Ho System, Actually — the latter a guide to the Ho System itself — are its live instances, served as static sites at star-actually.sageframe.net; each subject is a separate content repo that pins and consumes this shared engine.",
+        "Python 3.12+ (the Loom and CLI on pyyaml, markdown-it-py, and jinja2) that outputs a static, htmx-based site, with an optional FastAPI + Anthropic \"Receptionist\" service; MIT-licensed, published as the star-actually package and consumed by per-subject instance repos."
       ],
       "images": {
         "gallery": []
       },
       "_keisaku": {
-        "generated_at": "2026-07-12T10:36:24",
+        "generated_at": "2026-07-13T10:31:21",
         "generator_version": "1",
         "sources": {
           "readme": "README.md",
+          "description": "metadata/description.md",
           "manifest": "pyproject.toml"
         },
         "derived_defaults": {
@@ -62,6 +74,11 @@
             "pyyaml",
             "markdown-it-py",
             "jinja2"
+          ],
+          "short_description": "A domain-blind engine that weaves a directory of depth-layered markdown into a fully static, navigable, terminal-aesthetic knowledge site.",
+          "substantive_description": [
+            "Most technical documentation is written by the people who built the thing for the people who already understand the field, and it fails the actual job: getting someone from \"I have a question\" to \"I understand enough to act.\" *, Actually is the answer, and star-actually is its engine — a build system that renders knowledge organized by question and relationship rather than by product surface, giving every concept depth layers (name, definition, usage, relationships, full theory) the reader can dial through at will. The engine is domain-blind: it never mentions any subject, and everything specific arrives from an instance repo through two files — a site.yaml and a directory of depth-layered markdown nodes. It has three parts: the Loom parses and validates the node graph and renders the static site; the Terminal is the reading experience — HTML, CSS, one vanilla JavaScript file, and vendored htmx, with zero external requests; and the Receptionist is an optional FastAPI service that maps a natural-language question to an entry node, with the site degrading gracefully to a browsable graph and full-text search when it is absent. The deeper argument is about reader agency: the reader of a typical man page has none, and *, Actually is what reader agency looks like when the architecture is built to support it. SSH, Actually and Ho System, Actually — the latter a guide to the Ho System itself — are its live instances, served as static sites at star-actually.sageframe.net; each subject is a separate content repo that pins and consumes this shared engine.",
+            "Python 3.12+ (the Loom and CLI on pyyaml, markdown-it-py, and jinja2) that outputs a static, htmx-based site, with an optional FastAPI + Anthropic \"Receptionist\" service; MIT-licensed, published as the star-actually package and consumed by per-subject instance repos."
           ]
         },
         "contract_issues": [
