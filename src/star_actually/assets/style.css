@@ -117,18 +117,18 @@ hr { border: none; border-top: 1px solid var(--rule); margin: var(--step) 0; }
   color: var(--dim);
   font-size: 0.86em;
   padding-top: calc(var(--step) / 3);
-  min-height: var(--step);
+  /* Three rows reserved (one walked + two spare) so the reading pane holds
+     still while the path grows; content shifts only past the third row. */
+  min-height: calc(var(--step) * 3);
   display: flex;
   align-items: baseline;
   gap: 1ch;
 }
-/* Only the walked path scrolls; the return chip lives outside the track so a
-   long journey can never push the one-keypress-back affordance off-screen. */
+/* The walked path wraps — every crumb stays visible; the return chip lives
+   outside the track so it is never pushed off-screen. */
 .rail .rail-track {
   flex: 1 1 auto;
   min-width: 0;
-  white-space: nowrap;
-  overflow-x: auto;
 }
 .rail:empty::before { content: "\00a0"; }
 .rail .rail-sep { color: var(--rule); padding: 0 0.5ch; }

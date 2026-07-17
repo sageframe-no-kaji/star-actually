@@ -165,8 +165,6 @@
 
   /* ── the rail ──────────────────────────────────────────────────── */
 
-  var RAIL_SHOWN = 5;
-
   function renderRail() {
     var rail = document.getElementById("rail");
     if (!rail) return;
@@ -175,20 +173,14 @@
     var path = journey.path;
     if (!path.length) return;
 
-    /* The path scrolls inside its own track; the return chip is pinned as a
-       sibling of the track (see .rail-return in the CSS) so it stays put. */
+    /* The full path renders and wraps inside its own track — every crumb
+       stays visible; the return chip is pinned as a sibling of the track
+       (see .rail-return in the CSS) so it stays put. */
     var track = document.createElement("div");
     track.className = "rail-track";
 
-    var start = Math.max(0, path.length - RAIL_SHOWN);
-    if (start > 0) {
-      track.appendChild(span("rail-node", "…"));
-      track.appendChild(span("rail-sep", "›"));
-    }
-
     path.forEach(function (visit, i) {
-      if (i < start) return;
-      if (i > start) track.appendChild(span("rail-sep", "›"));
+      if (i > 0) track.appendChild(span("rail-sep", "›"));
       if (i === path.length - 1) {
         track.appendChild(span("rail-here", "▶ " + visit.title + " @" + visit.depth));
       } else {
@@ -218,10 +210,6 @@
         rail.appendChild(span("rail-return", "↩ return to " + origin.title + " @" + origin.depth));
       }
     }
-
-    /* Keep the current node (the end of the track) in view; the pinned chip
-       sits just past it rather than scrolling the head of the path away. */
-    track.scrollLeft = track.scrollWidth;
   }
 
   function span(cls, text) {
