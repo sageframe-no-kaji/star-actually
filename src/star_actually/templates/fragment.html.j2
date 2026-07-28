@@ -35,7 +35,11 @@
     </div>
     {% for link in chains %}
     <div class="chain-strip" data-chain-id="{{ link.chain_id }}">
-      <span class="chain-title">{{ link.title }}</span>
+      {# the title is the way out to the whole sequence — position tells you
+         where you are, this tells you what you are in (ho-03) #}
+      <a class="chain-title" href="{{ site.base_path }}/c/{{ link.chain_id }}/"
+         hx-get="{{ site.base_path }}/c/{{ link.chain_id }}.html" hx-target="#content" hx-swap="outerHTML"
+         hx-push-url="{{ site.base_path }}/c/{{ link.chain_id }}/">{{ link.title }}</a>
       <span class="chain-position">{{ link.index }}/{{ link.total }}</span>
       {# both controls always render in fixed slots; the unavailable direction
          is present but disabled, so the click targets never move — mirrors

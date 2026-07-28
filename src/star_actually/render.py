@@ -5,6 +5,8 @@ Output layout (Kamae 2 §4):
 - ``index.html`` — the entry screen
 - ``n/<id>/index.html`` — full page, noscript-complete, at the default depth
 - ``n/<id>/d<k>.html`` — cumulative fragment: node at depths 1..k
+- ``c/<id>/index.html`` — a chain's whole sequence as a page (ho-03)
+- ``c/<id>.html`` — the same, as a swappable fragment
 - ``help.html`` — the keys and the ideas
 - ``catalog.json`` — the entry catalog
 - ``assets/`` — one stylesheet, one JS file, vendored htmx
@@ -14,7 +16,7 @@ from __future__ import annotations
 
 import json
 import shutil
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
@@ -60,6 +62,19 @@ def _titles(graph: Graph, ids: tuple[str, ...]) -> list[dict[str, str]]:
     return [{"id": i, "title": graph.nodes[i].title} for i in ids if i in graph.nodes]
 
 
+def _members(graph: Graph, chain: Chain) -> list[dict[str, str]]:
+    """A chain's steps in order, each with the gloss the index page shows.
+
+    Members are already existence-checked by ``validate_chains``; the guard is
+    belt-and-braces so a future caller can't fault the whole build on one id.
+    """
+    return [
+        {"id": i, "title": graph.nodes[i].title, "summary": graph.nodes[i].summary}
+        for i in chain.nodes
+        if i in graph.nodes
+    ]
+
+
 def _render_fragment(
     env: Environment,
     md: MarkdownIt,
@@ -100,6 +115,11 @@ def render_site(
     validated_chains, chain_warnings = validate_chains(
         site.chains, set(graph.nodes), allow_dangling=allow_dangling
     )
+    # Every template that reads `site.chains` — the chrome's chain links, the
+    # entry listing, the help page's [/] keys — must see the *validated* set.
+    # A chain dropped under allow_dangling has no page; advertising it would
+    # ship a link to a 404.
+    site = replace(site, chains=validated_chains)
     env = _environment(TEMPLATES_DIR)
     md = _markdown()
 
@@ -148,6 +168,27 @@ def render_site(
             ),
         )
         (node_dir / "full.html").write_text(corpus, encoding="utf-8")
+
+    # The chain index (ho-03). ho-02 gave the reader a way to *walk* a chain
+    # from inside it; it gave no way to *see* one. Without this page a chain is
+    # discoverable only by landing on a member — six nodes out of sixty-eight,
+    # by accident. Each chain gets a fragment (for the swap) and a page (the
+    # no-JS floor), mirroring the node routes above.
+    for chain in validated_chains:
+        chain_dir = out_dir / "c" / chain.id
+        chain_dir.mkdir(parents=True)
+        chain_fragment = env.get_template("chain.html.j2").render(
+            site=site, chain=chain, members=_members(graph, chain)
+        )
+        (out_dir / "c" / f"{chain.id}.html").write_text(chain_fragment, encoding="utf-8")
+        fragments += 1
+        chain_page = env.get_template("base.html.j2").render(
+            site=site,
+            page_title=f"{chain.title} · {site.title}",
+            content=chain_fragment,
+        )
+        (chain_dir / "index.html").write_text(chain_page, encoding="utf-8")
+        pages += 1
 
     root_node = graph.nodes.get(site.root_node)
     if root_node is None and not allow_dangling:

@@ -31,6 +31,19 @@
         <li><kbd>?</kbd> — this screen</li>
       </ul>
 
+      {% if site.chains -%}
+      <h2>{{ 'The chains' if site.chains | length > 1 else 'The chain' }}</h2>
+      <p>Some things in this subject have an order. Those are <em>chains</em> —
+      fixed sequences you can read straight through, or drop into anywhere.
+      Every screen carries a link to {{ 'them' if site.chains | length > 1 else 'it' }} in the header.</p>
+      <ul class="key-list">
+        {% for c in site.chains %}
+        <li><a href="{{ site.base_path }}/c/{{ c.id }}/">&equiv; {{ c.title }}</a>
+        &mdash; {{ c.nodes | length }} steps, in order</li>
+        {% endfor %}
+      </ul>
+      {%- endif %}
+
       <h2>The ideas</h2>
       <p>Your path is always visible. Branches return in one keypress.
       <strong>Getting lost is not possible.</strong></p>

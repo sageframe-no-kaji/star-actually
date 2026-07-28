@@ -62,6 +62,20 @@ author: "A"
 """
 
 
+def _declare_chain(root: Path, extra: str = "") -> None:
+    """Append a two-member chain (and any extra keys) to the synthetic site.yaml."""
+    site = (root / "site.yaml").read_text(encoding="utf-8")
+    (root / "site.yaml").write_text(
+        site
+        + extra
+        + "chains:\n"
+        + '  - id: "kamae"\n'
+        + '    title: "The Kamae chain"\n'
+        + '    nodes: ["root-idea", "child-idea"]\n',
+        encoding="utf-8",
+    )
+
+
 @pytest.fixture
 def synthetic_root(tmp_path: Path) -> Path:
     """A minimal repo root: two nodes and a site.yaml. Templates and assets
@@ -300,6 +314,126 @@ class TestRenderSite:
         assert "chain-prev is-disabled" in frag
         assert "chain-next is-disabled" in frag
         assert "ghost-node" not in frag
+
+    def test_chain_index_page_and_fragment(self, synthetic_root: Path) -> None:
+        """A chain is seeable whole, not just walkable one step at a time
+        (ho-03): every member, in order, numbered, linked, with its gloss."""
+        _declare_chain(synthetic_root)
+        out = synthetic_root / "dist"
+        result = render_site(synthetic_root, out)
+
+        page = out / "c" / "kamae" / "index.html"
+        fragment = out / "c" / "kamae.html"
+        assert page.exists()
+        assert fragment.exists()
+        assert "<!DOCTYPE html>" in page.read_text(encoding="utf-8")
+
+        body = fragment.read_text(encoding="utf-8")
+        assert 'data-chain-id="kamae"' in body
+        assert "The Kamae chain" in body
+        assert "2 steps, in order" in body
+        # both members, in declaration order, as links with their summaries
+        assert body.index("The Root Idea") < body.index("The Child Idea")
+        assert 'href="/n/root-idea/"' in body
+        assert 'href="/n/child-idea/"' in body
+        assert "Where everything starts." in body
+        assert "Follows from the root." in body
+        # not a node: the journey rail must not record the index as a stop
+        assert 'data-node-id="kamae"' not in body
+        # 3 root depths + 2 child depths + 1 chain fragment
+        assert result.fragments == 6
+
+    def test_chain_index_reachable_from_chrome_entry_and_strip(self, synthetic_root: Path) -> None:
+        """Three doors, because ho-02's strip alone left the chain invisible on
+        every non-member node: the site header, the entry screen, the strip."""
+        _declare_chain(synthetic_root)
+        out = synthetic_root / "dist"
+        render_site(synthetic_root, out)
+
+        # the chrome: on a node page, and on a node that is *not* a member
+        node_page = (out / "n" / "root-idea" / "index.html").read_text(encoding="utf-8")
+        assert 'class="head-chain"' in node_page
+        assert 'href="/c/kamae/"' in node_page
+        assert "The Kamae chain &middot; 2" in node_page
+
+        # the entry screen
+        entry = (out / "index.html").read_text(encoding="utf-8")
+        assert 'class="nav-chain" href="/c/kamae/"' in entry
+        assert "2 steps, in order" in entry
+
+        # the strip's title, now a way out to the whole sequence
+        frag = (out / "n" / "root-idea" / "d2.html").read_text(encoding="utf-8")
+        assert 'class="chain-title" href="/c/kamae/"' in frag
+        assert 'hx-get="/c/kamae.html"' in frag
+
+        # and the help page names it
+        help_html = (out / "help.html").read_text(encoding="utf-8")
+        assert 'href="/c/kamae/"' in help_html
+
+    def test_chain_index_carries_base_path(self, synthetic_root: Path) -> None:
+        _declare_chain(synthetic_root, extra='base_path: "/sub"\n')
+        out = synthetic_root / "dist"
+        render_site(synthetic_root, out)
+        body = (out / "c" / "kamae.html").read_text(encoding="utf-8")
+        assert 'href="/sub/n/root-idea/"' in body
+        node_page = (out / "n" / "root-idea" / "index.html").read_text(encoding="utf-8")
+        assert 'href="/sub/c/kamae/"' in node_page
+
+    def test_no_chains_means_no_chain_routes_or_chrome(self, synthetic_root: Path) -> None:
+        out = synthetic_root / "dist"
+        render_site(synthetic_root, out)
+        assert not (out / "c").exists()
+        node_page = (out / "n" / "root-idea" / "index.html").read_text(encoding="utf-8")
+        assert "head-chain" not in node_page
+        assert "entry-chains" not in (out / "index.html").read_text(encoding="utf-8")
+
+    def test_two_chains_get_two_indexes_and_two_chrome_links(self, synthetic_root: Path) -> None:
+        site = (synthetic_root / "site.yaml").read_text(encoding="utf-8")
+        (synthetic_root / "site.yaml").write_text(
+            site
+            + "chains:\n"
+            + '  - id: "first"\n    title: "First chain"\n    nodes: ["root-idea", "child-idea"]\n'
+            + '  - id: "second"\n    title: "Second chain"\n    nodes: ["root-idea"]\n',
+            encoding="utf-8",
+        )
+        out = synthetic_root / "dist"
+        render_site(synthetic_root, out)
+        assert (out / "c" / "first" / "index.html").exists()
+        assert (out / "c" / "second" / "index.html").exists()
+        node_page = (out / "n" / "root-idea" / "index.html").read_text(encoding="utf-8")
+        assert node_page.count('class="head-chain"') == 2
+
+    def test_fully_dropped_chain_is_not_advertised(self, synthetic_root: Path) -> None:
+        """Under allow_dangling a chain can lose every member. It then has no
+        index page — so nothing may link to one (that would ship a 404)."""
+        site = (synthetic_root / "site.yaml").read_text(encoding="utf-8")
+        (synthetic_root / "site.yaml").write_text(
+            site + 'chains:\n  - id: "ghost"\n    title: "G"\n    nodes: ["nowhere"]\n',
+            encoding="utf-8",
+        )
+        out = synthetic_root / "dist"
+        result = render_site(synthetic_root, out, allow_dangling=True)
+        assert any("no surviving members" in w for w in result.warnings)
+        assert not (out / "c" / "ghost").exists()
+        node_page = (out / "n" / "root-idea" / "index.html").read_text(encoding="utf-8")
+        assert "head-chain" not in node_page
+        # the [ / ] keys are inert too, so help must not list them
+        assert "<kbd>[</kbd>" not in (out / "help.html").read_text(encoding="utf-8")
+
+    def test_chain_index_survives_a_dropped_member(self, synthetic_root: Path) -> None:
+        """A partially-dropped chain indexes only what actually exists."""
+        site = (synthetic_root / "site.yaml").read_text(encoding="utf-8")
+        (synthetic_root / "site.yaml").write_text(
+            site
+            + "chains:\n"
+            + '  - id: "kamae"\n    title: "K"\n    nodes: ["root-idea", "ghost-node"]\n',
+            encoding="utf-8",
+        )
+        out = synthetic_root / "dist"
+        render_site(synthetic_root, out, allow_dangling=True)
+        body = (out / "c" / "kamae.html").read_text(encoding="utf-8")
+        assert "1 steps, in order" in body
+        assert "ghost-node" not in body
 
     def test_depth_pages_exist(self, synthetic_root: Path) -> None:
         """Every depth is a full page too — the no-JS dial lands on chrome."""

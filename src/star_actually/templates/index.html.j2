@@ -29,6 +29,16 @@
   </p>
   {% endif %}
 
+  {% if site.chains %}
+  {# The front door names the sequences. A reader who arrives knowing the
+     subject has an ordered spine should not have to find it by wandering. #}
+  <div class="entry-chains">
+    {% for c in site.chains %}
+    <a class="nav-chain" href="{{ site.base_path }}/c/{{ c.id }}/">&equiv; {{ c.title }} &mdash; {{ c.nodes | length }} steps, in order</a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
   <p class="entry-help"><a href="{{ site.base_path }}/help.html">? what is this place</a></p>
 
   {% if site.blurb %}

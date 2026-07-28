@@ -104,6 +104,7 @@ hr { border: none; border-top: 1px solid var(--rule); margin: var(--step) 0; }
   display: flex;
   gap: 2ch;
   align-items: baseline;
+  flex-wrap: wrap;
   border-bottom: 1px solid var(--rule);
   width: 100%;
   max-width: 100%;
@@ -112,6 +113,18 @@ hr { border: none; border-top: 1px solid var(--rule); margin: var(--step) 0; }
 .site-name { color: var(--fg); font-weight: bold; }
 .site-name:hover { color: var(--accent); text-decoration: none; }
 .site-tagline { color: var(--dim); font-size: 0.86em; }
+
+/* Chains ride the far end of the head, present on every page. Quiet at rest —
+   this is a standing exit, not a call to action — but never absent. */
+.head-chains {
+  margin-left: auto;
+  display: flex;
+  gap: 2ch;
+  flex-wrap: wrap;
+  font-size: 0.86em;
+}
+.head-chain { color: var(--dim); white-space: nowrap; }
+.head-chain:hover, .head-chain:focus-visible { color: var(--accent); }
 
 .rail {
   color: var(--dim);
@@ -210,12 +223,63 @@ hr { border: none; border-top: 1px solid var(--rule); margin: var(--step) 0; }
 }
 .chain-strip + .chain-strip { margin-top: calc(var(--step) / 3); }
 
-.chain-title { color: var(--dim); }
+/* The title is a link out to the whole sequence. Dotted rule rather than a
+   colour change: it reads as clickable without shouting over the position. */
+.chain-title {
+  color: var(--dim);
+  border-bottom: 1px dotted var(--rule);
+}
+.chain-title:hover, .chain-title:focus-visible {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+  text-decoration: none;
+}
 .chain-position { color: var(--accent); }
 .chain-step { white-space: nowrap; }
 /* the unavailable direction stays in place, greyed and inert — mirrors
    .depth-step.is-disabled above. */
 .chain-step.is-disabled { color: var(--dim); pointer-events: none; }
+
+/* ── the chain index ────────────────────────────────────────────────── */
+
+.node-type-chain { color: var(--accent); }
+.chain-count { color: var(--dim); font-size: 0.86em; margin: calc(var(--step) / 2) 0 0 0; }
+
+/* Numbered by counter, not by the browser's marker: the terminal wants a
+   zero-padded ordinal in the accent, aligned on the monospace grid. */
+.chain-list {
+  list-style: none;
+  counter-reset: step;
+  margin: var(--step) 0 0 0;
+  padding: 0;
+}
+.chain-item {
+  counter-increment: step;
+  margin: 0 0 var(--step) 0;
+  padding-left: 5ch;
+  position: relative;
+}
+.chain-item::before {
+  content: counter(step, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+}
+/* A vertical rule joins the steps — the sequence is visible as a sequence,
+   not as a list that happens to be numbered. */
+.chain-item::after {
+  content: "";
+  position: absolute;
+  left: 1ch;
+  top: var(--step);
+  bottom: calc(var(--step) * -1 + 2px);
+  border-left: 1px solid var(--rule);
+}
+.chain-item:last-child::after { display: none; }
+
+.chain-member { display: block; font-size: 1.06em; color: var(--fg); }
+.chain-member:hover, .chain-member:focus-visible { color: var(--accent); text-decoration: none; }
+.chain-item-summary { display: block; color: var(--dim); font-size: 0.93em; }
 
 /* ── layers ─────────────────────────────────────────────────────────── */
 
@@ -340,6 +404,10 @@ body.entry { justify-content: space-between; }
 @media (prefers-reduced-motion: reduce) { .entry-title::after { animation: none; } }
 
 .entry-start, .entry-help { margin-top: var(--step); }
+/* A chain is a door, peer to "start at the beginning" — same accent, so the
+   entry screen offers two ways in rather than one plus a footnote. */
+.entry-chains { margin-top: calc(var(--step) / 2); }
+.nav-chain { display: block; padding: 0.1rem 0; color: var(--accent); }
 .entry-help a { color: var(--dim); }
 .entry-help a:hover { color: var(--accent); }
 .entry-about { color: var(--dim); max-width: 62ch; line-height: 1.55; margin-top: calc(var(--step) * 3); }
@@ -364,6 +432,9 @@ body.entry { justify-content: space-between; }
   .node-title-line { flex-wrap: wrap; }
   .node-type { margin-left: 0; }
   .action-bar { gap: 2ch; }
+  /* wrapped onto its own row, the chain links read left-aligned like everything
+     else — the right-push only makes sense while they share the title's row */
+  .head-chains { margin-left: 0; }
 }
 
 /* Light-mode concrete overrides (must follow the dark rules they replace). */

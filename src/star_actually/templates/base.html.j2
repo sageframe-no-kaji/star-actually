@@ -10,6 +10,17 @@
 <header class="site-head">
   <a class="site-name" href="{{ site.base_path }}/">{{ site.title }}</a>
   <span class="site-tagline">{{ site.tagline }}</span>
+  {%- if site.chains %}
+  {# A chain is fixed structure, not a place you happen to be — so it lives in
+     the chrome, reachable from every node, not only from its own members. #}
+  <nav class="head-chains" aria-label="chains">
+    {%- for c in site.chains %}
+    <a class="head-chain" href="{{ site.base_path }}/c/{{ c.id }}/"
+       hx-get="{{ site.base_path }}/c/{{ c.id }}.html" hx-target="#content" hx-swap="outerHTML"
+       hx-push-url="{{ site.base_path }}/c/{{ c.id }}/">&equiv; {{ c.title }} &middot; {{ c.nodes | length }}</a>
+    {%- endfor %}
+  </nav>
+  {%- endif %}
 </header>
 
 <div class="rail" id="rail" aria-label="your path"></div>

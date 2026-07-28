@@ -74,10 +74,13 @@
     return el.querySelector(selector);
   }
 
+  /* The number keys pick from whatever the screen offers: a node's onward and
+     lateral links, or — on the chain index — the steps of the chain. */
   function navLinks() {
     var el = content();
     if (!el) return [];
-    return Array.prototype.slice.call(el.querySelectorAll(".nav-forward, .nav-lateral"));
+    return Array.prototype.slice.call(
+      el.querySelectorAll(".nav-forward, .nav-lateral, .chain-member"));
   }
 
   /* ── moving ────────────────────────────────────────────────────── */
@@ -113,9 +116,12 @@
     swapTo(target.id, target.depth);
   }
 
-  /* Follow the first onward link (or the root link on the entry screen). */
+  /* Follow the first onward link — or, on the chain index, its first step; or
+     the root link on the entry screen. ↓ always means "into the thing in
+     front of you," whatever screen that is. */
   function goOnward() {
-    var link = firstLink(".nav-forward") || document.querySelector(".nav-root");
+    var link = firstLink(".nav-forward") || firstLink(".chain-member") ||
+      document.querySelector(".nav-root");
     if (link) link.click();
   }
 

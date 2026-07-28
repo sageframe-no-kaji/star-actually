@@ -1,0 +1,30 @@
+{# The chain index (ho-03): a sequence seen whole.
+
+   The strip in a node header answers "where am I in this?"; this page answers
+   "what is this?" — every step, in order, clickable, with its own gloss. It is
+   not a node: no depth dial, no neighborhoods, and deliberately no
+   `data-node-id`, so the journey rail keeps the last node the reader was
+   actually standing on. #}
+<article class="chain-index" id="content" data-chain-id="{{ chain.id }}">
+
+  <header class="node-head">
+    <div class="node-title-line">
+      <h1 class="node-title">{{ chain.title }}</h1>
+      <span class="node-type node-type-chain">chain</span>
+    </div>
+    <p class="chain-count">{{ members | length }} steps, in order &mdash; start anywhere</p>
+  </header>
+
+  <ol class="chain-list">
+    {% for m in members %}
+    <li class="chain-item">
+      <a class="nav-node chain-member" data-node-id="{{ m.id }}"
+         href="{{ site.base_path }}/n/{{ m.id }}/"
+         hx-get="{{ site.base_path }}/n/{{ m.id }}/d{{ 2 }}.html" hx-target="#content" hx-swap="outerHTML"
+         hx-push-url="{{ site.base_path }}/n/{{ m.id }}/">{{ m.title }}</a>
+      <span class="chain-item-summary">{{ m.summary }}</span>
+    </li>
+    {% endfor %}
+  </ol>
+
+</article>
