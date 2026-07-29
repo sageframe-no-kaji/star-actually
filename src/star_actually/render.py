@@ -171,9 +171,9 @@ def render_site(
 
     # The chain index (ho-03). ho-02 gave the reader a way to *walk* a chain
     # from inside it; it gave no way to *see* one. Without this page a chain is
-    # discoverable only by landing on a member — six nodes out of sixty-eight,
-    # by accident. Each chain gets a fragment (for the swap) and a page (the
-    # no-JS floor), mirroring the node routes above.
+    # discoverable only by landing on one of its members — a vanishing fraction
+    # of any real node set, and only by accident. Each chain gets a fragment
+    # (for the swap) and a page (the no-JS floor), mirroring the node routes.
     for chain in validated_chains:
         chain_dir = out_dir / "c" / chain.id
         chain_dir.mkdir(parents=True)
