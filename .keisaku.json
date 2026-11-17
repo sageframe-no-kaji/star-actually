@@ -44,7 +44,7 @@
       ],
       "tech_stack": "Python (pyyaml, markdown-it-py, jinja2)",
       "created": "2026-03-15",
-      "last_updated": "2026-07-10",
+      "last_updated": "2026-07-29",
       "conceived": "2026-04-12",
       "short_description": "A domain-blind engine that weaves a directory of depth-layered markdown into a fully static, navigable, terminal-aesthetic knowledge site.",
       "substantive_description": [
@@ -57,7 +57,7 @@
       "availability": "shipped",
       "usage": "others",
       "_keisaku": {
-        "generated_at": "2026-07-13T10:31:21",
+        "generated_at": "2026-11-16T10:49:42",
         "generator_version": "1",
         "sources": {
           "readme": "README.md",
