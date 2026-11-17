@@ -1,5 +1,5 @@
 {
-  "keisaku": 1,
+  "keisaku": 2,
   "works": [
     {
       "id": "star-actually",
@@ -57,10 +57,11 @@
       "availability": "shipped",
       "usage": "others",
       "_keisaku": {
-        "generated_at": "2026-11-16T10:49:42",
+        "generated_at": "2026-11-17T15:26:26",
         "generator_version": "1",
         "sources": {
           "readme": "README.md",
+          "contract": "ho-process/kamae-6-star-actually-state-memory.md",
           "description": "metadata/description.md",
           "manifest": "pyproject.toml"
         },
@@ -70,6 +71,7 @@
           "media": [
             "software"
           ],
+          "status": "shipped",
           "created": "2026-07-08",
           "tags": [
             "python",
@@ -83,9 +85,7 @@
             "Python 3.12+ (the Loom and CLI on pyyaml, markdown-it-py, and jinja2) that outputs a static, htmx-based site, with an optional FastAPI + Anthropic \"Receptionist\" service; MIT-licensed, published as the star-actually package and consumed by per-subject instance repos."
           ]
         },
-        "contract_issues": [
-          "no-contract-source"
-        ]
+        "contract_issues": []
       }
     }
   ]
