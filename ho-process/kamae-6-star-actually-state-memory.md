@@ -8,32 +8,30 @@ last work and `BLOCKS — none` while that work had never shipped._
 
 - **COMPLETED** — star-actually is the domain-blind engine (Loom, Terminal,
   Receptionist) behind the `*, Actually` guides, consumed by instance repos by
-  pinned git tag. **Engine v0.5.0 cut, pushed and deployed 2026-11-18**,
-  carrying ho-03's chain discovery (chain index at `c/<id>/`, chrome link on
-  every node, entry-screen door, linked strip title). All three stars —
-  `ho-actually`, `ssh-actually`, `zfs-actually` — are on v0.5.0 and live;
-  verified against the public URLs, not local builds. ho-04 closed: the
-  release plus the shipping-gap guard — `build.sh` now prints each star's
-  resolved engine version and ships it as `<star>/engine-version.txt`.
-  ho-03 closed 2026-07-29 but did not reach a reader until today.
+  pinned git tag. **Engine v0.5.1 is live on all three stars** —
+  `ho-actually`, `ssh-actually`, `zfs-actually` — verified against the public
+  URLs, not local builds.
+  - **v0.5.0** (ho-03 + ho-04, shipped 2026-11-18): chain discovery — chain
+    index at `c/<id>/`, chrome link on every node, entry-screen door, linked
+    strip title. ho-03 closed 2026-07-29 but did not reach a reader until
+    today. ho-04 added the shipping-gap guard: `build.sh` prints each star's
+    resolved engine version and ships it as `<star>/engine-version.txt`.
+    Bumping `zfs-actually` surfaced five more chains with the same defect.
+  - **v0.5.1** (ho-05, shipped 2026-11-18): the action bar dims the keys that
+    do nothing on the current page instead of failing silently under the
+    finger. 4 dimmed on a chain index, 5 on help, 0 on a node.
 
-- **NEXT** — Resolve the two decisions ho-03 and ho-04 both deferred to the
-  practitioner (see ACTION ITEMS); neither blocks anything shipped. No engine
-  feature work is queued.
+- **NEXT** — Nothing queued. No engine feature work pending; one open decision
+  below, deliberately held.
 
-- **ACTION ITEMS / BLOCKS** — Nothing blocked; two open decisions, both the
-  practitioner's:
-  1. `app.js` is at **468 lines** against Kamae 2 §5's "≤~400 lines, no build
-     step." ho-01 recorded a revised ~450 at 453 lines; ho-02 recorded 479 and
-     deferred; ho-03 deferred at 468. Three consecutive deferrals is an
-     unstated decision to exceed the budget. **Refactor, or revise the number
-     on the record.**
-  2. **The action bar advertises dead keys on the chain index.**
-     `base.html.j2` always lists `− deeper`, `+ surface`, `→ branch`,
-     `↵ return`; none function there. Shared with `help.html`, so
-     pre-existing — but the chain index is now reachable from every page on
-     three live sites. Options: per-page key manifest, disabled styling
-     mirroring the depth dial's `is-disabled`, or an accepted no-op.
+- **ACTION ITEMS / BLOCKS** — Nothing blocked. One open decision, held by the
+  practitioner on 2026-11-18 ("leave it, ask me again later"):
+  - `app.js` is at **468 lines** against Kamae 2 §5's "≤~400 lines, no build
+    step." ho-01 recorded a revised ~450 at 453 lines; ho-02 recorded 479 and
+    deferred; ho-03 deferred at 468. Raised again this session and explicitly
+    held rather than deferred, which is the difference that matters. **Raise
+    it again at the next ho that touches `app.js`:** refactor, or revise the
+    number on the record.
 
   Also noted, not blocking: Kamae 2 §4's `dist/` tree is four hos stale. Per
   forward-only it is not edited; the current layout is recorded in ho-04 and
