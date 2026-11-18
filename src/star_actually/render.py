@@ -29,6 +29,14 @@ from star_actually.nodes import Node, load_nodes
 
 DEFAULT_DEPTH = 2
 
+# Which action-bar keys do nothing on which kind of page (ho-05). app.js binds
+# the keys against what is actually on screen, so a page without a depth dial,
+# lateral links or a journey position leaves several of them inert. The bar
+# still lists every key — slots stay fixed — but the renderer marks the inert
+# ones so they render dimmed instead of silently failing under the finger.
+DEAD_KEYS_CHAIN = ("deeper", "surface", "branch", "return")
+DEAD_KEYS_HELP = ("onward", "deeper", "surface", "branch", "return")
+
 # The Terminal ships with the engine, not the instance. Templates and assets are
 # package data, resolved relative to this module so any instance (whatever its
 # working directory) renders with the same presentation layer.
@@ -186,6 +194,7 @@ def render_site(
             site=site,
             page_title=f"{chain.title} · {site.title}",
             content=chain_fragment,
+            dead_keys=DEAD_KEYS_CHAIN,
         )
         (chain_dir / "index.html").write_text(chain_page, encoding="utf-8")
         pages += 1
@@ -201,6 +210,7 @@ def render_site(
         site=site,
         page_title=f"help · {site.title}",
         content=env.get_template("help.html.j2").render(site=site),
+        dead_keys=DEAD_KEYS_HELP,
     )
     (out_dir / "help.html").write_text(help_page, encoding="utf-8")
 

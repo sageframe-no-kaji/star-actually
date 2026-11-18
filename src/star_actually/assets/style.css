@@ -363,6 +363,11 @@ hr { border: none; border-top: 1px solid var(--rule); margin: var(--step) 0; }
 }
 .key-hint { white-space: nowrap; }
 .key-hint a { color: inherit; }
+/* A key that does nothing on this page keeps its slot and recedes — same
+   discipline as .depth-step.is-disabled, but the bar is already --dim, so
+   the signal here is weight rather than colour. */
+.key-hint.is-disabled { opacity: 0.4; }
+.key-hint.is-disabled kbd { border-style: dashed; }
 
 /* ── the entry screen ───────────────────────────────────────────────── */
 

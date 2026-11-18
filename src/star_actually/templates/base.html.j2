@@ -29,13 +29,22 @@
 {{ content | safe }}
 </main>
 
+{# The bar advertises the same keys everywhere so nothing moves between pages,
+   but a key that does nothing here renders dimmed — the fixed-slot discipline
+   the depth dial and the chain strip already follow. `dead_keys` comes from the
+   renderer, which knows what kind of page this is; the reader never has to
+   press a key to discover it was inert. #}
+{%- set dead = dead_keys | default(()) -%}
 <footer class="action-bar" id="action-bar">
-  <span class="key-hint"><kbd>&uarr;</kbd> back</span>
-  <span class="key-hint"><kbd>&darr;</kbd> onward</span>
-  <span class="key-hint"><kbd>&minus;</kbd> deeper</span>
-  <span class="key-hint"><kbd>+</kbd> surface</span>
-  <span class="key-hint"><kbd>&rarr;</kbd> branch</span>
-  <span class="key-hint"><kbd>&crarr;</kbd> return</span>
+  {%- for key, glyph, label in [
+      ('back', '&uarr;', 'back'),
+      ('onward', '&darr;', 'onward'),
+      ('deeper', '&minus;', 'deeper'),
+      ('surface', '+', 'surface'),
+      ('branch', '&rarr;', 'branch'),
+      ('return', '&crarr;', 'return')] %}
+  <span class="key-hint{% if key in dead %} is-disabled{% endif %}"><kbd>{{ glyph | safe }}</kbd> {{ label }}</span>
+  {%- endfor %}
   <span class="key-hint"><a href="{{ site.base_path }}/"><kbd>/</kbd> search</a></span>
   <span class="key-hint"><a href="{{ site.base_path }}/help.html"><kbd>?</kbd> help</a></span>
 </footer>

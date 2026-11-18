@@ -527,3 +527,60 @@ class TestSearchIndex:
         )
         assert main(["--root", str(synthetic_root), "build"]) == 1
         assert "indexing failed" in capsys.readouterr().err
+
+
+class TestActionBarDeadKeys:
+    """The bar lists every key on every page so slots never move, but a key
+    that does nothing here renders dimmed rather than failing under the
+    finger (ho-05)."""
+
+    def test_node_page_has_no_dead_keys(self, synthetic_root: Path) -> None:
+        out = synthetic_root / "dist"
+        render_site(synthetic_root, out)
+        page = (out / "n" / "root-idea" / "index.html").read_text(encoding="utf-8")
+        assert "key-hint is-disabled" not in page
+        assert page.count('class="key-hint') == 8
+
+    def test_chain_index_dims_the_inert_keys(self, synthetic_root: Path) -> None:
+        _declare_chain(synthetic_root)
+        out = synthetic_root / "dist"
+        render_site(synthetic_root, out)
+        page = (out / "c" / "kamae" / "index.html").read_text(encoding="utf-8")
+        # no depth dial, no lateral links, no journey position here — and the
+        # assertion names each one, so a mis-wired dead_keys set cannot pass
+        # on the count alone
+        for glyph, label in (
+            ("&minus;", "deeper"),
+            ("+", "surface"),
+            ("&rarr;", "branch"),
+            ("&crarr;", "return"),
+        ):
+            assert f'<span class="key-hint is-disabled"><kbd>{glyph}</kbd> {label}</span>' in page
+        assert page.count("key-hint is-disabled") == 4
+        # the keys that *do* work are untouched: onward enters the first step
+        assert '<span class="key-hint"><kbd>&darr;</kbd> onward</span>' in page
+        assert '<span class="key-hint"><kbd>&uarr;</kbd> back</span>' in page
+        # every slot still present — nothing moves between pages
+        assert page.count('class="key-hint') == 8
+
+    def test_help_page_dims_onward_too(self, synthetic_root: Path) -> None:
+        """Help has no onward target either, so it dims one more than a chain."""
+        out = synthetic_root / "dist"
+        render_site(synthetic_root, out)
+        page = (out / "help.html").read_text(encoding="utf-8")
+        assert page.count("key-hint is-disabled") == 5
+        assert page.count('class="key-hint') == 8
+
+    def test_search_and_help_are_never_dimmed(self, synthetic_root: Path) -> None:
+        """They are real links, live on every page including their own."""
+        _declare_chain(synthetic_root)
+        out = synthetic_root / "dist"
+        render_site(synthetic_root, out)
+        for page_path in (
+            out / "help.html",
+            out / "c" / "kamae" / "index.html",
+            out / "n" / "root-idea" / "index.html",
+        ):
+            page = page_path.read_text(encoding="utf-8")
+            assert '<span class="key-hint"><a href="/"><kbd>/</kbd> search</a></span>' in page
+            assert 'help.html"><kbd>?</kbd> help</a></span>' in page
