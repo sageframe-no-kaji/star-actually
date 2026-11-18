@@ -1,8 +1,10 @@
 # star-actually — State Memory
 
-_Updated 2026-11-18 from work done in-session (release v0.5.0 and the deploy).
-Supersedes the 2026-11-17 agent-written version, which recorded ho-03 as the
-last work and `BLOCKS — none` while that work had never shipped._
+_Session closed 2026-11-18, practitioner present and signing off. Written from
+work done in-session (releases v0.5.0 and v0.5.1, both deployed and verified
+against the public URLs). Supersedes the 2026-11-17 agent-written version,
+which recorded ho-03 as the last work and `BLOCKS — none` while that work had
+never reached a reader._
 
 **STATE-SUMMARY**
 
@@ -38,6 +40,35 @@ last work and `BLOCKS — none` while that work had never shipped._
   kept live in `render.py`'s module docstring.
 
 - **PROJECT LIFECYCLE** — production
+
+---
+
+## Session close — 2026-11-18
+
+Opened on a complaint, not a ho: the practitioner could not find the Kamae
+chain on `ho-actually` and had been unable to for months. Diagnosis was that
+nothing had shipped — ho-03 closed in July against a green local stack and
+never left the machine.
+
+**Hos closed:** ho-04 (release v0.5.0 + the shipping-gap guard), ho-05
+(dimmed action-bar keys, v0.5.1). Both closed against the live URL.
+
+**Decisions the practitioner took this session:**
+- Chain links ride in the persistent site chrome, not member nodes only —
+  taken in July, shipped today.
+- Bump all three stars to one engine rather than only the one with the bug.
+  Reasoning: a split family keeps the new stale-pin warning permanently lit
+  and therefore ignorable.
+- Dim the inert action-bar keys rather than hide them or accept them.
+- Hold `app.js` at 468 lines for now; ask again at the next ho that touches
+  it. Recorded as a decision taken, not a fourth silent deferral.
+
+**Left untouched deliberately:** `stars/zfs-actually/.keisaku.json` in the
+site repo — another session's uncommitted edit, not this session's to stage.
+
+**Both repos clean and pushed** (`sageframe-no-kaji/star-actually` at
+`eace6ec`, `sageframe-dharma/star-actually` at `2b7e311`). Nothing is
+mid-flight; a fresh session can start anywhere.
 
 ---
 
