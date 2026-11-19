@@ -29,22 +29,22 @@
         {
           "label": "*, Actually site",
           "url": "https://star-actually.sageframe.net",
-          "role": "production"
+          "role": "live"
         },
         {
           "label": "SSH, Actually edition",
           "url": "https://star-actually.sageframe.net/ssh-actually/",
-          "role": "production"
+          "role": "live"
         },
         {
           "label": "Ho, Actually edition",
           "url": "https://star-actually.sageframe.net/ho-actually/",
-          "role": "production"
+          "role": "live"
         }
       ],
       "tech_stack": "Python (pyyaml, markdown-it-py, jinja2)",
       "created": "2026-03-15",
-      "last_updated": "2026-07-29",
+      "last_updated": "2026-11-18",
       "conceived": "2026-04-12",
       "short_description": "A domain-blind engine that weaves a directory of depth-layered markdown into a fully static, navigable, terminal-aesthetic knowledge site.",
       "substantive_description": [
@@ -57,7 +57,7 @@
       "availability": "shipped",
       "usage": "others",
       "_keisaku": {
-        "generated_at": "2026-11-17T15:26:26",
+        "generated_at": "2026-11-19T17:23:05",
         "generator_version": "1",
         "sources": {
           "readme": "README.md",
